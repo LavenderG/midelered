@@ -47,8 +47,11 @@ ReadTrainer:
 ; else the first byte is the level of every pokemon on the team
 .IterateTrainer
 	ld a, [hli]
-	cp $FF ; is the trainer special?
+	cp TRAINERTYPE_POKERED_SPECIAL ; is the trainer special?
 	jr z, .SpecialTrainer ; if so, check for special moves
+	cp TRAINERTYPE_CUSTOM ; is the trainer custom?
+	jp z, .CustomTrainer
+	; else, assumed to be TRAINERTYPE_POKERED_NORMAL
 	ld [wCurEnemyLVL], a
 .LoopTrainerData
 	ld a, [hli]
@@ -163,4 +166,67 @@ ReadTrainer:
 	inc de
 	dec b
 	jr nz, .LastLoop ; repeat wCurEnemyLVL times
+	ret
+
+.CustomTrainer
+	; current party mon counter, starts at 0
+	ld b, 0
+.party_loop
+	ld a, [hli]
+	; byte 0: party terminator
+	cp 0
+	jr z, .party_end
+
+	ld [wCurEnemyLVL], a ; fist byte is level
+	ld a, [hli]
+	ld [wcf91], a ; second byte is species
+
+	; Add mon to party
+	ld a, ENEMY_PARTY_DATA
+	ld [wMonDataLocation], a
+	push hl
+	call AddPartyMon
+	pop hl
+
+	; set wEnemyMonxMoves at de, with x = b + 1
+	push bc
+	push hl
+	ld a, b
+	ld bc, 44 ; party_struct_length
+	ld hl, wEnemyMon1Moves
+	call AddNTimes
+	ld d, h
+	ld e, l
+	pop hl
+	pop bc
+
+	; set moves after adding mon to party
+	ld a, [hli]
+	call ConvertToValidMove
+	ld [de], a ; third byte is fist move
+	inc de
+	ld a, [hli]
+	call ConvertToValidMove
+	ld [de], a ; fourth byte is second move
+	inc de
+	ld a, [hli]
+	call ConvertToValidMove
+	ld [de], a ; fifth byte is third move
+	inc de
+	ld a, [hli]
+	call ConvertToValidMove
+	ld [de], a ; sixth byte is fourth move
+
+	; increment party mon counter
+	inc b
+	jr .party_loop
+.party_end
+	jr .FinishUp
+
+; converts a to a valid move
+; fix used to use 0 as a valid move without breaking ReadTrainer routine
+ConvertToValidMove:
+	cp NO_MOVE
+	ret nz
+	xor a
 	ret
