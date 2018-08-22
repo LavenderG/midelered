@@ -405,6 +405,8 @@ StatusScreen2:
 	call PrintLevel
 	pop af
 	ld [wLoadedMonLevel], a
+	; backup loaded mon exp
+	call BackupLoadedMonExp
 	ld de, wLoadedMonExp
 	coord hl, 12, 4
 	lb bc, 3, 7
@@ -414,6 +416,8 @@ StatusScreen2:
 	coord hl, 7, 6
 	lb bc, 3, 7
 	call PrintNumber ; exp needed to level up
+	; restore loaded mon exp
+	call RestoreLoadedMonExp
 	coord hl, 9, 0
 	call StatusScreen_ClearName
 	coord hl, 9, 1
@@ -717,6 +721,38 @@ StatusScreenPlaceStatExpStats:
 	coord hl, 14, 15
 	ld de, wLoadedMonSpecialExp
 	call PrintNumber
+	ret
+
+BackupLoadedMonExp:
+	push bc
+	push de
+	push hl
+
+	ld b, 0
+	ld c, 3
+	ld hl, wLoadedMonExp
+	ld de, wBuffer
+	call CopyData
+
+	pop hl
+	pop de
+	pop bc
+	ret
+
+RestoreLoadedMonExp:
+	push bc
+	push de
+	push hl
+
+	ld b, 0
+	ld c, 3
+	ld hl, wBuffer
+	ld de, wLoadedMonExp
+	call CopyData
+
+	pop hl
+	pop de
+	pop bc
 	ret
 
 ; Third screen text
