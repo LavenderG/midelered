@@ -429,6 +429,71 @@ StatusScreen2:
 	call WaitForTextScrollButtonPress ; wait for button
 	pop af
 	ld [hTilesetType], a
+	ret
+
+; DV and Stat Experience screen
+StatusScreen3:
+	ld a, [hTilesetType]
+	push af
+	xor a
+	ld [hTilesetType], a
+	ld [H_AUTOBGTRANSFERENABLED], a
+	coord hl, 9, 2
+	lb bc, 5, 10
+	call ClearScreenArea ; Clear under name
+	coord hl, 19, 3
+	ld [hl], $78
+	coord hl, 0, 8
+	ld b, 8
+	ld c, 18
+	call TextBoxBorder ; Draw move container
+
+	call StatusScreenPlaceDVLabels
+	call StatusScreenPlaceDVStats
+	call StatusScreenPlaceStatExpLabels
+	call StatusScreenPlaceStatExpStats
+
+	coord hl, 9, 3
+	ld de, StatusScreenExpText
+	call PlaceString
+	ld a, [wLoadedMonLevel]
+	push af
+	cp MAX_LEVEL
+	jr z, .Level100
+	inc a
+	ld [wLoadedMonLevel], a ; Increase temporarily if not 100
+.Level100
+	coord hl, 14, 6
+	ld [hl], $70 ; 1-tile "to"
+	inc hl
+	inc hl
+	call PrintLevel
+	pop af
+	ld [wLoadedMonLevel], a
+	ld de, wLoadedMonExp
+	coord hl, 12, 4
+	lb bc, 3, 7
+	call PrintNumber ; exp
+	call CalcExpToLevelUp
+	ld de, wLoadedMonExp
+	coord hl, 7, 6
+	lb bc, 3, 7
+	call PrintNumber ; exp needed to level up
+	coord hl, 9, 0
+	call StatusScreen_ClearName
+	coord hl, 9, 1
+	call StatusScreen_ClearName
+	ld a, [wMonHIndex]
+	ld [wd11e], a
+	call GetMonName
+	coord hl, 9, 1
+	call PlaceString
+	ld a, $1
+	ld [H_AUTOBGTRANSFERENABLED], a
+	call Delay3
+	call WaitForTextScrollButtonPress ; wait for button
+	pop af
+	ld [hTilesetType], a
 	ld hl, wd72c
 	res 1, [hl]
 	ld a, $77
@@ -479,3 +544,187 @@ StatusScreen_PrintPP:
 	dec c
 	jr nz, StatusScreen_PrintPP
 	ret
+
+; places DV labels on screen
+StatusScreenPlaceDVLabels:
+	coord hl, 1, 9
+	ld de, DVsString
+	call PlaceString
+	coord hl, 1, 11
+	ld de, HPString
+	call PlaceString
+	coord hl, 1, 12
+	ld de, AttackString
+	call PlaceString
+	coord hl, 1, 13
+	ld de, DefenseString
+	call PlaceString
+	coord hl, 1, 14
+	ld de, SpeedString
+	call PlaceString
+	coord hl, 1, 15
+	ld de, SpecialString
+	call PlaceString
+	ret
+
+; places DV data on screen
+StatusScreenPlaceDVStats:
+	; modified, originally by:
+	; by Aurelio Mannara - BitBuilt 2017
+	; ShockSlayer helped ( °v°)
+	ld de, wLoadedMonDVs
+	ld a, [de]
+	ld b, a
+	inc de
+	ld a, [de]
+	ld c, a
+	push bc
+
+
+	ld de, wLoadedMonDVs
+	ld a, 0
+	ld [de], a
+	inc de
+	pop bc
+	ld a, b
+	push bc
+	and $f0
+	swap a
+	ld [de], a
+	coord hl, 5, 12 ; atk disp coords
+	lb bc, LEADING_ZEROES | 2, 2
+	ld de, wLoadedMonDVs
+	call PrintNumber
+
+	ld de, wLoadedMonDVs
+	ld a, 0
+	ld [de], a
+	inc de
+	pop bc
+	ld a, b
+	push bc
+	and $f
+	ld [de], a
+	coord hl, 5, 13 ; def disp coords
+	lb bc, LEADING_ZEROES | 2, 2
+	ld de, wLoadedMonDVs
+	call PrintNumber
+
+	ld de, wLoadedMonDVs
+	ld a, 0
+	ld [de], a
+	inc de
+	pop bc
+	ld a, c
+	push bc
+	and $f0
+	swap a
+	ld [de], a
+	coord hl, 5, 14 ; spe disp coords
+	lb bc, LEADING_ZEROES | 2, 2
+	ld de, wLoadedMonDVs
+	call PrintNumber
+
+	ld de, wLoadedMonDVs
+	ld a, 0
+	ld [de], a
+	inc de
+	pop bc
+	ld a, c
+	push bc
+	and $f
+	ld [de], a
+	coord hl, 5, 15 ; spc disp coords
+	lb bc, LEADING_ZEROES | 2, 2
+	ld de, wLoadedMonDVs
+	call PrintNumber
+
+	ld de, wLoadedMonDVs
+	ld a, 0
+	ld [de], a
+	inc de
+	pop bc
+	bit 4, b
+	jr z, .noAttackHP
+	set 3, a
+.noAttackHP
+	bit 0, b
+	jr z, .noDefenseHP
+	set 2, a
+.noDefenseHP
+	bit 4, c
+	jr z, .noSpeedHP
+	set 1, a
+.noSpeedHP
+	bit 0, c
+	jr z, .noSpecialHP
+	set 0, a
+.noSpecialHP
+	push bc
+	ld [de], a
+	coord hl, 5, 11 ; hp disp coords
+	lb bc, LEADING_ZEROES | 2, 2
+	ld de, wLoadedMonDVs
+	call PrintNumber
+
+	ld de, wLoadedMonDVs
+	pop bc
+	ld a, b
+	ld [de], a
+	inc de
+	ld a, c
+	ld [de], a
+
+	ret
+
+; places stat experience labels on screen
+StatusScreenPlaceStatExpLabels:
+	coord hl, 10, 9
+	ld de, StatExpString
+	call PlaceString
+	coord hl, 10, 11
+	ld de, HPString
+	call PlaceString
+	coord hl, 10, 12
+	ld de, AttackString
+	call PlaceString
+	coord hl, 10, 13
+	ld de, DefenseString
+	call PlaceString
+	coord hl, 10, 14
+	ld de, SpeedString
+	call PlaceString
+	coord hl, 10, 15
+	ld de, SpecialString
+	call PlaceString
+	ret
+
+; places stat experience values on screen
+StatusScreenPlaceStatExpStats:
+	lb bc, LEADING_ZEROES | 2, 5
+	coord hl, 14, 11
+	ld de, wLoadedMonHPExp
+	call PrintNumber
+	coord hl, 14, 12
+	ld de, wLoadedMonAttackExp
+	call PrintNumber
+	coord hl, 14, 13
+	ld de, wLoadedMonDefenseExp
+	call PrintNumber
+	coord hl, 14, 14
+	ld de, wLoadedMonSpeedExp
+	call PrintNumber
+	coord hl, 14, 15
+	ld de, wLoadedMonSpecialExp
+	call PrintNumber
+	ret
+
+; Third screen text
+DVsString:     db "DVs@"
+StatExpString: db "EXP@"
+HPString:      db "HP@"
+AttackString:  db "ATK@"
+DefenseString: db "DEF@"
+SpeedString:   db "SPD@"
+SpecialString: db "SPC@"
+DebugString:   db "DEBUG STR@"
