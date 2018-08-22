@@ -1,3 +1,5 @@
+__DEBUG_RUN__ = 1
+
 BattleCore:
 
 ; These are move effects (second value from the Moves table in bank $E).
@@ -1664,6 +1666,9 @@ TryRunningFromBattle:
 .trainerBattle
 	ld hl, NoRunningText
 .printCantEscapeOrNoRunningText
+IF __DEBUG_RUN__ == 1
+	call DebugEnemyStats
+ENDC
 	call PrintText
 	ld a, 1
 	ld [wForcePlayerToChooseMon], a
@@ -8718,3 +8723,122 @@ PlayBattleAnimationGotID:
 	pop de
 	pop hl
 	ret
+
+IF __DEBUG_RUN__ == 1
+DebugEnemyStats:
+	call DebugEnemyPrintLabels
+	call DebugEnemyPrintStats
+	call DebugEnemyPrintStatExperience
+	ret
+
+DebugEnemyPrintLabels:
+	push de
+	push hl
+
+	; Enemy stats
+	coord hl, 2, 2
+	ld de, .EnemyString
+	call PlaceString
+	; HP
+	coord hl, 2, 4
+	ld de, .HPString
+	call PlaceString
+	; ATK
+	coord hl, 2, 5
+	ld de, .AttackString
+	call PlaceString
+	; DEF
+	coord hl, 2, 6
+	ld de, .DefenseString
+	call PlaceString
+	; SPD
+	coord hl, 2, 7
+	ld de, .SpeedString
+	call PlaceString
+	; SPC
+	coord hl, 2, 8
+	ld de, .SpecialString
+	call PlaceString
+
+	pop hl
+	pop de
+	ret
+.EnemyString:   db "ENEMY STATS@"
+.HPString:      db "HP@"
+.AttackString:  db "ATK@"
+.DefenseString: db "DEF@"
+.SpeedString:   db "SPD@"
+.SpecialString: db "SPC@"
+
+DebugEnemyPrintStats:
+	push bc
+	push de
+	push hl
+
+	lb bc, LEADING_ZEROES | 2, 3
+	; HP
+	coord hl, 6, 4
+	ld de, wEnemyMonHP
+	call PrintNumber
+	; MAX HP
+	coord hl, 10, 4
+	ld de, wEnemyMonMaxHP
+	call PrintNumber
+	; ATK
+	coord hl, 6, 5
+	ld de, wEnemyMonAttack
+	call PrintNumber
+	; DEF
+	coord hl, 6, 6
+	ld de, wEnemyMonDefense
+	call PrintNumber
+	; SPD
+	coord hl, 6, 7
+	ld de, wEnemyMonSpeed
+	call PrintNumber
+	; SPC
+	coord hl, 6, 8
+	ld de, wEnemyMonSpecial
+	call PrintNumber
+
+	pop hl
+	pop de
+	pop bc
+	ret
+
+DebugEnemyPrintStatExperience:
+	push bc
+	push de
+	push hl
+
+	lb bc, LEADING_ZEROES | 2, 5
+	; HP
+	coord hl, 14, 4
+	ld de, wEnemyMon1HPExp
+	call PrintNumber
+	; ATK
+	coord hl, 14, 5
+	ld de, wEnemyMon1AttackExp
+	call PrintNumber
+	; DEF
+	coord hl, 14, 6
+	ld de, wEnemyMon1DefenseExp
+	call PrintNumber
+	; SPD
+	coord hl, 14, 7
+	ld de, wEnemyMon1SpeedExp
+	call PrintNumber
+	; SPC
+	coord hl, 14, 8
+	ld de, wEnemyMon1SpecialExp
+	call PrintNumber
+	; DVs
+	coord hl, 14, 9
+	ld de, wEnemyMon1DVs
+	call PrintNumber
+
+	pop hl
+	pop de
+	pop bc
+	ret
+ENDC
