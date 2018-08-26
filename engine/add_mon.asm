@@ -214,6 +214,15 @@ _AddPartyMon:
 	ld [de], a
 	xor a
 	ld b, NUM_STATS * 2
+	; write $FF to all stat experience values
+	; if the mon is the enemy in a trainer battle
+	ld a, [wMonDataLocation]
+	and $f
+	jr z, .writeEVsLoop
+	ld a, [wIsInBattle]
+	dec a
+	jr z, .writeEVsLoop
+	ld a, $FF
 .writeEVsLoop              ; set all EVs to 0
 	inc de
 	ld [de], a
@@ -237,10 +246,34 @@ _AddPartyMon:
 	jr .done
 .calcFreshStats
 	pop hl
+	push hl
 	ld bc, wPartyMon1HPExp - 1 - wPartyMon1
 	add hl, bc
-	ld b, $0
+	ld b, $1               ; use stat experience in calculation
 	call CalcStats         ; calculate fresh set of stats
+	; update enemy mon current hp in enemy trainer battle
+	pop hl
+	ld a, [wMonDataLocation]
+	and $f
+	jr z, .done
+	ld a, [wIsInBattle]
+	dec a
+	jr z, .done
+	inc hl
+	push hl
+	ld bc, wPartyMon1MaxHP - wPartyMon1 - 1
+	add hl, bc
+	ld a, [hli]
+	ld [wBuffer], a
+	ld a, [hl]
+	ld [wBuffer + 1], a
+	pop hl
+	ld bc, wPartyMon1HP - wPartyMon1 - 1
+	add hl, bc
+	ld a, [wBuffer]
+	ld [hli], a
+	ld a, [wBuffer + 1]
+	ld [hl], a
 .done
 	scf
 	ret

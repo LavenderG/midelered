@@ -6230,9 +6230,22 @@ LoadEnemyMonData:
 	ld a, [wCurEnemyLVL]
 	ld [de], a
 	inc de
-	ld b, $0
+	ld a, [wIsInBattle]
+	dec a
+	jr z, .not_use_stat_exp
+	ld a, $1 ; use stat experience in calculation
+.not_use_stat_exp
+	ld b, a
 	ld hl, wEnemyMonHP
 	push hl
+	push bc
+	push de
+	ld hl, wEnemyMon1HPExp - 1
+	ld a, [wWhichPokemon]
+	ld bc, wEnemyMon2 - wEnemyMon1
+	call AddNTimes
+	pop de
+	pop bc
 	call CalcStats
 	pop hl
 	ld a, [wIsInBattle]
