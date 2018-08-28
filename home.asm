@@ -4579,6 +4579,7 @@ Random::
 	pop hl
 	ret
 
+INCLUDE "home/badge_cap.asm"
 
 INCLUDE "home/predef.asm"
 

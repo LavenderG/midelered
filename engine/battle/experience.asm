@@ -21,6 +21,21 @@ GainExperience:
 	and a ; is mon's gain exp flag set?
 	pop hl
 	jp z, .nextMon ; if mon's gain exp flag not set, go to next mon
+
+	; badge level cap
+	call GetBadgeLevel
+	push hl
+	ld de, (wPartyMon1Level) - (wPartyMon1HP + 1)
+	add hl, de
+	ld a, [hl] ; mon level
+	pop hl
+	cp MAX_LEVEL
+	; if level is 100, continue normally
+	jr z, .gain_stat_exp
+	cp b
+	; if level is >= level cap, done
+	jp nc, .done
+.gain_stat_exp
 	ld de, (wPartyMon1HPExp + 1) - (wPartyMon1HP + 1)
 	add hl, de
 	ld d, h

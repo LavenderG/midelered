@@ -1335,6 +1335,11 @@ ItemUseMedicine:
 	ld a, [hl] ; a = level
 	cp MAX_LEVEL
 	jr z, .vitaminNoEffect ; can't raise level above 100
+	; check badge level cap
+	call GetBadgeLevel
+	ld a, [hl]
+	cp b
+	jr nc, .vitaminNoEffect
 	inc a
 	ld [hl], a ; store incremented level
 	ld [wCurEnemyLVL], a
