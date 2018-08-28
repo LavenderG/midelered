@@ -1279,15 +1279,39 @@ ItemUseMedicine:
 	jr nc, .noCarry2
 	inc h
 .noCarry2
-	ld a, 10
+	ld a, [hli]
 	ld b, a
-	ld a, [hl] ; a = MSB of stat experience of the appropriate stat
-	cp 100 ; is there already at least 25600 (256 * 100) stat experience?
-	jr nc, .vitaminNoEffect ; if so, vitamins can't add any more
-	add b ; add 2560 (256 * 10) stat experience
-	jr nc, .noCarry3 ; a carry should be impossible here, so this will always jump
-	ld a, 255
-.noCarry3
+	ld a, [hl]
+	ld c, a
+	ld a, b
+
+	; If the most significant byte is maxed out, check least significant byte
+	cp $ff
+	jr z, .check_lsb
+	; If the stat is greater than 62720, set most significant
+	; byte and least significant byte to maximum.
+	cp $f5
+	jr nc, .max_out_msb
+	; If not, add 2560
+	add 10
+	ld b, a
+	jr .done_vitamin
+.check_lsb
+	; If the least significant byte is maxed out, do nothing
+	; else, max out least significant byte
+	ld a, c
+	cp $ff
+	jr z, .vitaminNoEffect
+	jr .max_out_lsb
+.max_out_msb
+	ld b, $ff
+.max_out_lsb
+	ld c, $ff
+.done_vitamin
+	dec hl
+	ld a, b
+	ld [hli], a
+	ld a, c
 	ld [hl], a
 	pop hl
 	call .recalculateStats
