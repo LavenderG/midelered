@@ -6238,6 +6238,11 @@ LoadEnemyMonData:
 	ld b, a
 	ld hl, wEnemyMonHP
 	push hl
+	; if wild battle, calc stats from cur enemy
+	; else calc stats from party enemy
+	ld a, [wIsInBattle]
+	dec a
+	jr z, .calc_stats
 	push bc
 	push de
 	ld hl, wEnemyMon1HPExp - 1
@@ -6246,6 +6251,7 @@ LoadEnemyMonData:
 	call AddNTimes
 	pop de
 	pop bc
+.calc_stats
 	call CalcStats
 	pop hl
 	ld a, [wIsInBattle]
