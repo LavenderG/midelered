@@ -6231,17 +6231,21 @@ LoadEnemyMonData:
 	ld [de], a
 	inc de
 	ld a, [wIsInBattle]
-	dec a
+	cp 1 ; if trainer battle, not use stat exp
+	jr z, .not_use_stat_exp
+	and a ; if no battle, not use stat exp
 	jr z, .not_use_stat_exp
 	ld a, $1 ; use stat experience in calculation
 .not_use_stat_exp
 	ld b, a
 	ld hl, wEnemyMonHP
 	push hl
-	; if wild battle, calc stats from cur enemy
+	; if wild battle or no battle, calc stats from cur enemy
 	; else calc stats from party enemy
 	ld a, [wIsInBattle]
-	dec a
+	cp 1 ; wild battle
+	jr z, .calc_stats
+	and a ; no battle
 	jr z, .calc_stats
 	push bc
 	push de
