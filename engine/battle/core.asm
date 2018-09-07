@@ -6236,7 +6236,10 @@ LoadEnemyMonData:
 	and a ; if no battle, not use stat exp
 	jr z, .not_use_stat_exp
 	ld a, $1 ; use stat experience in calculation
+	jr .stat_exp_calc
 .not_use_stat_exp
+	ld a, $0
+.stat_exp_calc
 	ld b, a
 	ld hl, wEnemyMonHP
 	push hl
