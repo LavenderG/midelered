@@ -43,6 +43,24 @@ _OaksLabBulbasaurText::
 	cont "BULBASAUR?"
 	done
 
+_OaksLabMicoloStarter1Text::
+	text "So! You want the"
+	line "fire #MON,"
+	cont "MOLTRES?"
+	done
+
+_OaksLabMicoloStarter2Text::
+	text "So! You want the"
+	line "ice #MON,"
+	cont "ARTICUNO?"
+	done
+
+_OaksLabMicoloStarter3Text::
+	text "So! You want the"
+	line "electric #MON,"
+	cont "ZAPDOS?"
+	done
+
 _OaksLabMonEnergeticText::
 	text "This #MON is"
 	line "really energetic!"

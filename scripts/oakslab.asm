@@ -798,7 +798,13 @@ OaksLabText2:
 	ld [wRivalStarterTemp], a
 	ld a, $3
 	ld [wRivalStarterBallSpriteIndex], a
+	call IsMicoloName
+	jr c, .is_micolo
 	ld a, STARTER1
+	ld b, $2
+	jr OaksLabScript_1d133
+.is_micolo
+	ld a, STARTER1_MICOLO
 	ld b, $2
 	jr OaksLabScript_1d133
 
@@ -808,7 +814,13 @@ OaksLabText3:
 	ld [wRivalStarterTemp], a
 	ld a, $4
 	ld [wRivalStarterBallSpriteIndex], a
+	call IsMicoloName
+	jr c, .is_micolo
 	ld a, STARTER2
+	ld b, $3
+	jr OaksLabScript_1d133
+.is_micolo
+	ld a, STARTER2_MICOLO
 	ld b, $3
 	jr OaksLabScript_1d133
 
@@ -818,8 +830,14 @@ OaksLabText4:
 	ld [wRivalStarterTemp], a
 	ld a, $2
 	ld [wRivalStarterBallSpriteIndex], a
+	call IsMicoloName
+	jr c, .is_micolo
 	ld a, STARTER3
 	ld b, $4
+	jr OaksLabScript_1d133
+.is_micolo
+	ld a, STARTER3_MICOLO
+	ld b, $3
 
 OaksLabScript_1d133:
 	ld [wcf91], a
@@ -867,24 +885,54 @@ OaksLabScript_1d157:
 	jr OaksLabLookAtBulbasaur
 
 OaksLabLookAtCharmander:
+  call IsMicoloName
+  jr c, .is_micolo
 	ld hl, OaksLabCharmanderText
 	jr OaksLabMonChoiceMenu
+.is_micolo
+	ld hl, OaksLabMicoloStarter1Text
+	jr OaksLabMonChoiceMenu
+
 OaksLabCharmanderText:
 	TX_FAR _OaksLabCharmanderText
 	db "@"
 
+OaksLabMicoloStarter1Text:
+	TX_FAR _OaksLabMicoloStarter1Text
+	db "@"
+
 OaksLabLookAtSquirtle:
+	call IsMicoloName
+	jr c, .is_micolo
 	ld hl, OaksLabSquirtleText
 	jr OaksLabMonChoiceMenu
+.is_micolo
+	ld hl, OaksLabMicoloStarter2Text
+	jr OaksLabMonChoiceMenu
+
 OaksLabSquirtleText:
 	TX_FAR _OaksLabSquirtleText
 	db "@"
 
+OaksLabMicoloStarter2Text:
+	TX_FAR _OaksLabMicoloStarter2Text
+	db "@"
+
 OaksLabLookAtBulbasaur:
+	call IsMicoloName
+	jr c, .is_micolo
 	ld hl, OaksLabBulbasaurText
 	jr OaksLabMonChoiceMenu
+.is_micolo
+	ld hl, OaksLabMicoloStarter3Text
+	jr OaksLabMonChoiceMenu
+
 OaksLabBulbasaurText:
 	TX_FAR _OaksLabBulbasaurText
+	db "@"
+
+OaksLabMicoloStarter3Text:
+	TX_FAR _OaksLabMicoloStarter3Text
 	db "@"
 
 OaksLabMonChoiceMenu:

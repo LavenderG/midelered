@@ -382,6 +382,7 @@ INCLUDE "scripts/route1.asm"
 
 INCLUDE "data/mapHeaders/oakslab.asm"
 INCLUDE "scripts/oakslab.asm"
+INCLUDE "scripts/micolo_name.asm"
 INCLUDE "data/mapObjects/oakslab.asm"
 
 INCLUDE "data/mapHeaders/viridianmart.asm"
