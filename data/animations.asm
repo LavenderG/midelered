@@ -163,6 +163,8 @@ AttackAnimationPointers:
 	dw SuperFangAnim
 	dw SlashAnim
 	dw SubstituteAnim
+	dw MidelePowerAnim
+	dw DarkThunderAnim
 	dw StruggleAnim
 	dw ShowPicAnim
 	dw EnemyFlashAnim
@@ -675,6 +677,7 @@ ThunderWaveAnim:
 	db $04,$FF,$23
 	db $FF
 
+DarkThunderAnim:
 ThunderAnim:
 	db SE_DARK_SCREEN_PALETTE, $56
 	db SE_DARK_SCREEN_FLASH, $FF
@@ -1123,6 +1126,25 @@ SubstituteAnim:
 	db $08,$FF,$47
 	db SE_SUBSTITUTE_MON, $FF
 	db $FF
+
+MidelePowerAnim:
+	db SE_DARK_SCREEN_PALETTE, $56
+	db SE_DARK_SCREEN_FLASH, $FF
+	db $46,$FF,$2B
+	db SE_DARK_SCREEN_FLASH, $FF
+	db $42,$54,$29
+	db SE_RESET_SCREEN_PALETTE, $FF
+	db $04,$3A,$38
+	db $04,$37,$38
+	db $06,$37,$1A
+	db $06,$37,$1A
+	db $46,$7D,$1F
+	db $46,$FF,$20
+	db $46,$FF,$20
+	db $46,$FF,$0C
+	db $46,$FF,$0D
+	db $FF
+
 
 BallTossAnim:
 	db $03,$FF,$06
