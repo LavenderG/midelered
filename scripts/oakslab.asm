@@ -191,6 +191,15 @@ OaksLabScript7:
 	ret
 
 OaksLabScript8:
+	call IsMicoloName
+	jr c, .compare_micolo
+	ld a, [wPlayerStarter]
+	cp STARTER1
+	jr z, .Charmander
+	cp STARTER2
+	jr z, .Squirtle
+	jr .Bulbasaur
+.compare_micolo
 	ld a, [wPlayerStarter]
 	cp STARTER1_MICOLO
 	jr z, .Charmander
