@@ -192,9 +192,9 @@ OaksLabScript7:
 
 OaksLabScript8:
 	ld a, [wPlayerStarter]
-	cp STARTER1
+	cp STARTER1_MICOLO
 	jr z, .Charmander
-	cp STARTER2
+	cp STARTER2_MICOLO
 	jr z, .Squirtle
 	jr .Bulbasaur
 .Charmander
@@ -837,7 +837,7 @@ OaksLabText4:
 	jr OaksLabScript_1d133
 .is_micolo
 	ld a, STARTER3_MICOLO
-	ld b, $3
+	ld b, $4
 
 OaksLabScript_1d133:
 	ld [wcf91], a
