@@ -332,6 +332,8 @@ INCLUDE "engine/battle/bank_e_misc.asm"
 
 INCLUDE "engine/battle/read_trainer_party.asm"
 
+INCLUDE "engine/battle/leader_level.asm"
+
 INCLUDE "data/trainer_moves.asm"
 
 INCLUDE "data/trainer_parties.asm"
