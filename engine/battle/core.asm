@@ -1478,9 +1478,7 @@ EnemySendOutFirstMon:
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
 	jr z, .next4
-	ld a, [wOptions]
-	bit 6, a
-	jr nz, .next4
+	jr .next4 ; NUEVO, SET
 	ld hl, TrainerAboutToUseText
 	call PrintText
 	coord hl, 0, 7
@@ -2020,7 +2018,7 @@ DrawEnemyHUDAndHPBar:
 	call PrintEnemyMonShiny ; NUEVO PARA SHINY
 	;NUEVO MODIFICADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	;coord hl, 6, 1 ; antes era coord hl, 4, 1  ESTO ES PARA BATTLE EXP
-	coord hl, 2, 1 ; 
+	coord hl, 2, 1 ;
 	;NUEVO MODIFICADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	push hl
 	inc hl
@@ -3195,7 +3193,7 @@ ExecutePlayerMove:
 	ld [wMoveMissed], a
 	ld [wMonIsDisobedient], a
 	ld [wMoveDidntMiss], a
-	ld a, $a 
+	ld a, $a
 	ld [wDamageMultipliers], a
 	ld a, [wActionResultOrTookBattleTurn]
 	and a ; has the player already used the turn (e.g. by using an item, trying to run or switching pokemon)
@@ -5390,7 +5388,7 @@ AdjustDamageForMoveType:
 ; multiply by 3/2
 
 	ld hl, wDamageMultipliers
-	set 7, [hl] 
+	set 7, [hl]
 .skipSameTypeAttackBonus
 	ld a, [wMoveType]
 	ld b, a
@@ -5457,7 +5455,7 @@ AdjustDamageForMoveType:
 	jp .loop
 .done
 	ret
-	
+
 ; function to tell how effective the type of an enemy attack is on the player's current pokemon
 ;; this doesn't take into account the effects that dual types can have
 ;; (e.g. 4x weakness / resistance, weaknesses and resistances canceling)
