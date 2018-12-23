@@ -283,7 +283,20 @@ OverworldLoopLessDelay::
 	bit 6, a ; jumping a ledge?
 	jr nz, .normalPlayerSpriteAdvancement
 	call DoBikeSpeedup
+	; NUEVO PARA QUE LA BICI SEA MAS RAPIDA QUE CORRER
+	call DoBikeSpeedup ; added
+	call DoBikeSpeedup ; added
+	; NUEVO PARA QUE LA BICI SEA MAS RAPIDA QUE CORRER
+	jr .notRunning  ; NUEVO PARA PODER CORRER, CORREGIDO EL BUG AL USAR BICI Y CORRER
 .normalPlayerSpriteAdvancement
+; NUEVO PARA PODER CORRER
+; Add running shoes
+	ld a, [hJoyHeld] ; Check what buttons are being pressed
+	and B_BUTTON ; Are you holding B?
+	jr z, .notRunning ; If you aren't holding B, skip ahead to step normally.
+	call DoBikeSpeedup ; Make you go faster if you were holding B
+.notRunning ; Normal code resumes here
+; NUEVO PARA PODER CORRER
 	call AdvancePlayerSprite
 	ld a, [wWalkCounter]
 	and a

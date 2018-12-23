@@ -13,7 +13,7 @@ dw FlareonPicFront
 dw FlareonPicBack
 ; attacks known at lvl 0
 db TACKLE
-db SAND_ATTACK
+db TAIL_WHIP
 db QUICK_ATTACK
 db EMBER
 db 0 ; growth rate
@@ -25,4 +25,4 @@ db 0 ; growth rate
 	tmlearn 33,34,38,39,40
 	tmlearn 44
 	tmlearn 50
-db 0 ; padding
+db BANK(FlareonPicFront)

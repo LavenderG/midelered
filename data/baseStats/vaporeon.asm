@@ -13,7 +13,7 @@ dw VaporeonPicFront
 dw VaporeonPicBack
 ; attacks known at lvl 0
 db TACKLE
-db SAND_ATTACK
+db TAIL_WHIP
 db QUICK_ATTACK
 db WATER_GUN
 db 0 ; growth rate
@@ -25,4 +25,4 @@ db 0 ; growth rate
 	tmlearn 33,34,39,40
 	tmlearn 44
 	tmlearn 50,53
-db 0 ; padding
+db BANK(VaporeonPicFront)

@@ -14,7 +14,7 @@ dw ParasectPicBack
 ; attacks known at lvl 0
 db SCRATCH
 db STUN_SPORE
-db LEECH_LIFE
+db ABSORB
 db 0
 db 0 ; growth rate
 ; learnset
@@ -25,4 +25,4 @@ db 0 ; growth rate
 	tmlearn 33,34,40
 	tmlearn 44
 	tmlearn 50,51
-db 0 ; padding
+db BANK(ParasectPicFront)

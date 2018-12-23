@@ -141,3 +141,27 @@ TrainerPicAndMoneyPointers:
 
 	dw LancePic
 	money 9900
+
+	; NUEVO AÑADIENDO UN ENTRENADOR
+	dw RaguPic
+	money 9900
+	
+	dw GoldyPic
+	money 9900
+	
+	dw UtalaweaPic
+	money 9900
+	
+	dw EeveetoPic
+	money 9900
+	
+	dw JavisitPic
+	money 9900
+	
+	dw ManecPic
+	money 9900
+	
+	dw DarkiPic
+	money 9900
+	; NUEVO AÑADIENDO UN ENTRENADOR
+

@@ -11,7 +11,7 @@ MtMoon1Object:
 	db 1 ; signs
 	sign 15, 23, 14 ; MtMoon1Text14
 
-	db 13 ; objects
+	db 13 ; objects  
 	object SPRITE_HIKER, 5, 6, STAY, DOWN, 1, OPP_HIKER, 1
 	object SPRITE_BUG_CATCHER, 12, 16, STAY, RIGHT, 2, OPP_YOUNGSTER, 3
 	object SPRITE_LASS, 30, 4, STAY, DOWN, 3, OPP_LASS, 5

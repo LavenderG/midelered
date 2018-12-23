@@ -8,7 +8,7 @@ ItemPrices:
 	money 0     ; SURFBOARD
 	money 1000  ; SAFARI_BALL
 	money 0     ; POKEDEX
-	money 0     ; MOON_STONE
+	money 4800     ; MOON_STONE
 	money 100   ; ANTIDOTE
 	money 250   ; BURN_HEAL
 	money 250   ; ICE_HEAL
@@ -33,11 +33,11 @@ ItemPrices:
 	money 2100  ; FIRE_STONE
 	money 2100  ; THUNDER_STONE
 	money 2100  ; WATER_STONE
-	money 9800  ; HP_UP
-	money 9800  ; PROTEIN
-	money 9800  ; IRON
-	money 9800  ; CARBOS
-	money 9800  ; CALCIUM
+	money 4800  ; HP_UP
+	money 4800  ; PROTEIN
+	money 4800  ; IRON
+	money 4800  ; CARBOS
+	money 4800  ; CALCIUM
 	money 4800  ; RARE_CANDY
 	money 0     ; DOME_FOSSIL
 	money 0     ; HELIX_FOSSIL
@@ -47,7 +47,7 @@ ItemPrices:
 	money 950   ; X_ACCURACY
 	money 2100  ; LEAF_STONE
 	money 0     ; CARD_KEY
-	money 10000 ; NUGGET
+	money 20000 ; NUGGET
 	money 9800  ; XXX PP_UP
 	money 1000  ; POKE_DOLL
 	money 600   ; FULL_HEAL
@@ -77,7 +77,7 @@ ItemPrices:
 	money 0     ; OLD_ROD
 	money 0     ; GOOD_ROD
 	money 0     ; SUPER_ROD
-	money 0     ; PP_UP
+	money 4800     ; PP_UP
 	money 0     ; ETHER
 	money 0     ; MAX_ETHER
 	money 0     ; ELIXER

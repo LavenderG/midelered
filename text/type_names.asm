@@ -6,7 +6,7 @@ TypeNames:
 	dw .Poison
 	dw .Ground
 	dw .Rock
-	dw .Bird
+	dw .Steel  ;dw .Bird  	; NUEVO PARA TIPOS NUEVOS
 	dw .Bug
 	dw .Ghost
 
@@ -29,7 +29,9 @@ TypeNames:
 	dw .Psychic
 	dw .Ice
 	dw .Dragon
-	dw .Midele
+	dw .Dark 	; NUEVO PARA TIPOS NUEVOS
+	dw .Midele ; NUEVO PARA TIPOS NUEVOS
+	dw .Unknown ; NUEVO PARA TIPOS NUEVOS
 
 .Normal:   db "NORMAL@"
 .Fighting: db "FIGHTING@"
@@ -47,4 +49,7 @@ TypeNames:
 .Bug:      db "BUG@"
 .Ghost:    db "GHOST@"
 .Dragon:   db "DRAGON@"
-.Midele:   db "???@"
+.Dark      db "DARK@"
+.Steel:    db "STEEL@"
+.Midele:   db "MIDELE@" ; NUEVO PARA TIPOS NUEVOS
+.Unknown   db "???@" ; NUEVO TIPO PARA STRUGGLE 

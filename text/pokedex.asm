@@ -1508,3 +1508,149 @@ _VictreebelDexEntry::
 	next "from there"
 	dex
 
+_NosepassDexEntry::
+	text "Its magnetic nose" 
+	next "always faces north" 
+	next "and draws iron" 
+
+	page "objects to its" 
+	next "body to protect" 
+	next "itself better"
+	dex
+
+_ProbopassDexEntry::
+	text "The main body"
+	next "controls three" 
+	next "mobile units"
+
+	page "called Mini-Noses," 
+	next "which it maneuvers" 
+	next "to catch prey"
+	dex
+
+_MimikyuDexEntry::
+	text "If its neck is"
+	next "broken or its rag" 
+	next "torn during an"
+
+	page "attack, it works"
+	next "through the night"
+    next "to patch it"
+	dex
+
+_TogepiDexEntry::
+	text "It transforms the"
+	next "kindness and joy"
+	next "of others into"
+
+	page "happiness, which"
+	next "it stores in its"
+	next "shell"
+	dex
+
+_TogeticDexEntry::
+	text "To shares its"
+	next "happiness, it"
+	next "flies around the"
+
+	page "world seeking"
+	next "kind-hearted"
+	next "people"
+	dex
+
+_YamaskDexEntry::
+	text "Each of them"
+	next "carries a mask" 
+	next "that used to be" 
+
+	page "its face when" 
+	next "it was human"
+	dex
+
+_CofagrigusDexEntry::
+	text "They swallow" 
+	next "those who get" 
+	next "too close and"
+
+	page "turn them into" 
+	next "mummies"
+	dex
+
+_FomantisDexEntry::
+	text "When the sun"
+	next "rises, Fomantis" 
+	next "spreads its"
+
+	page "four leaves and" 
+	next "bathes in the"
+	next "sunlight"
+	dex
+
+_LurantisDexEntry::
+	text "Its elegant" 
+	next "appearance has" 
+	next "led some to call" 
+
+	page "it the most" 
+	next "glamorous Grass" 
+	next "Pokémon"
+	dex
+	
+_RowletDexEntry::
+	text "It sends its" 
+	next "feathers, which" 
+	next "are as sharp as" 
+
+	page "blades, flying"
+	next "in attack"
+	dex
+
+_DartrixDexEntry::
+	text "It throws sharp" 
+	next "feathers called" 
+	next "blade quills at" 
+
+	page "enemies or prey." 
+	next "It seldom misses"
+	dex
+
+_DecidueyeDexEntry::
+	text "DECIDUEYE can" 
+	next "nock and fire an" 
+	next "arrow at an" 
+
+	page "enemy in a tenth" 
+	next "of a second"
+	dex	
+	
+_LitwickDexEntry::
+	text "While shining a" 
+	next "light and"
+	next "pretending to be" 
+
+	page "a guide, it"
+	next "leeches off the" 
+	next "life force of"
+	
+	page "any who"
+	next "follow it"
+	dex
+
+_LampentDexEntry::
+	text "It arrives near" 
+	next "the moment of" 
+	next "death and steals" 
+
+	page "spirit from" 
+	next "the body"
+	dex
+
+_ChandelureDexEntry::
+	text "The spirits"
+	next "burned up in its" 
+	next "ominous flame"
+
+	page "lose their way" 
+	next "and wander this" 
+	next "world forever"
+	dex

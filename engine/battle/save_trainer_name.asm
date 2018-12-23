@@ -67,6 +67,13 @@ TrainerNamePointers:
 	dw wTrainerName
 	dw wTrainerName
 	dw wTrainerName
+	dw wTrainerName ; NUEVO AÑADIENDO UN ENTRENADOR
+	dw wTrainerName ; NUEVO AÑADIENDO UN ENTRENADOR
+	dw wTrainerName ; NUEVO AÑADIENDO UN ENTRENADOR
+	dw wTrainerName ; NUEVO AÑADIENDO UN ENTRENADOR
+	dw wTrainerName ; NUEVO AÑADIENDO UN ENTRENADOR
+	dw wTrainerName ; NUEVO AÑADIENDO UN ENTRENADOR
+	dw wTrainerName ; NUEVO AÑADIENDO UN ENTRENADOR
 
 YoungsterName:
 	db "YOUNGSTER@"

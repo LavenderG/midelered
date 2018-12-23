@@ -222,3 +222,4 @@ MtMoon1AfterBattleText8:
 MtMoon1Text14:
 	TX_FAR _MtMoon1Text14
 	db "@"
+

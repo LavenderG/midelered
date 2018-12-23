@@ -127,7 +127,8 @@ MainMenu:
 InitOptions:
 	ld a, 1 ; no delay
 	ld [wLetterPrintingDelayFlags], a
-	ld a, 3 ; medium speed
+	;ld a, 3 ; medium speed
+	ld a, $41 ; fast speed  ; NUEVO TEXTO RAPIDO POR DEFECTO, SET POR DEFECTO
 	ld [wOptions], a
 	ret
 
@@ -550,7 +551,7 @@ DisplayOptionMenu:
 	jp .eraseOldMenuCursor
 .cursorInBattleStyle
 	ld a, [wOptionsBattleStyleCursorX] ; battle style cursor X coordinate
-	xor $0b ; toggle between 1 and 10
+	ld a, 1 ; NUEVO, SET
 	ld [wOptionsBattleStyleCursorX], a
 	jp .eraseOldMenuCursor
 .pressedLeftInTextSpeed
@@ -588,7 +589,7 @@ BattleAnimationOptionText:
 
 BattleStyleOptionText:
 	db   "BATTLE STYLE"
-	next " SHIFT    SET@"
+	next " SET@"  ; NUEVO MODIFICADO PARA QUE SEA SOLO SET
 
 OptionMenuCancelText:
 	db "CANCEL@"
@@ -616,14 +617,8 @@ SetOptionsFromCursorPositions:
 .battleAnimationOn
 	res 7, d
 .checkBattleStyle
-	ld a, [wOptionsBattleStyleCursorX] ; battle style cursor X coordinate
-	dec a
-	jr z, .battleStyleShift
 .battleStyleSet
 	set 6, d
-	jr .storeOptions
-.battleStyleShift
-	res 6, d
 .storeOptions
 	ld a, d
 	ld [wOptions], a
@@ -657,6 +652,7 @@ SetCursorPositionsFromOptions:
 	jr nc, .storeBattleStyleCursorX
 	ld a, 10
 .storeBattleStyleCursorX
+	ld a, 1 ; NUEVO SET
 	ld [wOptionsBattleStyleCursorX], a ; battle style cursor X coordinate
 	coord hl, 0, 13
 	call .placeUnfilledRightArrow

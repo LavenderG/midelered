@@ -12,7 +12,7 @@ INCBIN "pic/bmon/pidgey.pic",0,1 ; 55, sprite dimensions
 dw PidgeyPicFront
 dw PidgeyPicBack
 ; attacks known at lvl 0
-db GUST
+db TACKLE
 db 0
 db 0
 db 0
@@ -25,4 +25,4 @@ db 3 ; growth rate
 	tmlearn 33,34,39
 	tmlearn 43,44
 	tmlearn 50,52
-db 0 ; padding
+db BANK(PidgeyPicFront)

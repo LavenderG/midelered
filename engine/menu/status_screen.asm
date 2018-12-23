@@ -123,6 +123,17 @@ StatusScreen:
 	predef DrawHP
 	ld hl, wStatusScreenHPBarColor
 	call GetHealthBarColor
+	; NUEVO PARA SHINY
+	ld de, wLoadedMonDVs
+	callba IsMonShiny
+	ld hl, wShinyMonFlag
+	jr nz, .shiny
+	res 0, [hl]
+	jr .setPal
+.shiny
+	set 0, [hl]
+.setPal
+; NUEVO PARA SHINY
 	ld b, SET_PAL_STATUS_SCREEN
 	call RunPaletteCommand
 	coord hl, 16, 6
@@ -164,8 +175,10 @@ StatusScreen:
 	ld de, wLoadedMonOTID
 	lb bc, LEADING_ZEROES | 2, 5
 	call PrintNumber ; ID Number
+	call PrintGenderStatusScreen ; NUEVO PARA GENEROS
 	ld d, $0
 	call PrintStatsBox
+	call PrintShinySymbol ; NUEVO PARA SHINY
 	call Delay3
 	call GBPalNormal
 	coord hl, 1, 0
@@ -244,6 +257,16 @@ DrawLineBox:
 PTile: ; This is a single 1bpp "P" tile
 	INCBIN "gfx/p_tile.1bpp"
 PTileEnd:
+
+; NUEVO PARA SHINY
+PrintShinySymbol:
+	ld de, wLoadedMonDVs
+	callba IsMonShiny
+	ret z
+	coord hl, 6, 7
+	ld [hl], "⁂"
+	ret
+;NUEVO PARA SHINY
 
 PrintStatsBox:
 	ld a, d
@@ -388,7 +411,8 @@ StatusScreen2:
 	cp $4
 	jr nz, .PrintPP
 .PPDone
-	coord hl, 9, 3
+; NUEVO TERCERA VENTANA DE STATS
+    coord hl, 9, 3
 	ld de, StatusScreenExpText
 	call PlaceString
 	ld a, [wLoadedMonLevel]
@@ -405,8 +429,10 @@ StatusScreen2:
 	call PrintLevel
 	pop af
 	ld [wLoadedMonLevel], a
+	; NUEVO PARA TERCERA VENTANA DE STATS
 	; backup loaded mon exp
 	call BackupLoadedMonExp
+	; NUEVO PARA TERCERA VENTANA DE STATS
 	ld de, wLoadedMonExp
 	coord hl, 12, 4
 	lb bc, 3, 7
@@ -416,8 +442,10 @@ StatusScreen2:
 	coord hl, 7, 6
 	lb bc, 3, 7
 	call PrintNumber ; exp needed to level up
+	; NUEVO PARA TERCERA VENTANA DE STATS
 	; restore loaded mon exp
 	call RestoreLoadedMonExp
+	; NUEVO PARA TERCERA VENTANA DE STATS
 	coord hl, 9, 0
 	call StatusScreen_ClearName
 	coord hl, 9, 1
@@ -434,7 +462,6 @@ StatusScreen2:
 	pop af
 	ld [hTilesetType], a
 	ret
-
 ; DV and Stat Experience screen
 StatusScreen3:
 	ld a, [hTilesetType]
@@ -451,12 +478,12 @@ StatusScreen3:
 	ld b, 8
 	ld c, 18
 	call TextBoxBorder ; Draw move container
-
 	call StatusScreenPlaceDVLabels
 	call StatusScreenPlaceDVStats
 	call StatusScreenPlaceStatExpLabels
 	call StatusScreenPlaceStatExpStats
 
+; NUEVO TERCERA VENTANA DE STATS
 	coord hl, 9, 3
 	ld de, StatusScreenExpText
 	call PlaceString
@@ -549,6 +576,7 @@ StatusScreen_PrintPP:
 	jr nz, StatusScreen_PrintPP
 	ret
 
+; NUEVO TERCERA VENTANA DE STATS
 ; places DV labels on screen
 StatusScreenPlaceDVLabels:
 	coord hl, 1, 9
@@ -583,7 +611,7 @@ StatusScreenPlaceDVStats:
 	ld a, [de]
 	ld c, a
 	push bc
-
+	
 
 	ld de, wLoadedMonDVs
 	ld a, 0
@@ -680,7 +708,6 @@ StatusScreenPlaceDVStats:
 	ld [de], a
 
 	ret
-
 ; places stat experience labels on screen
 StatusScreenPlaceStatExpLabels:
 	coord hl, 10, 9
@@ -722,18 +749,16 @@ StatusScreenPlaceStatExpStats:
 	ld de, wLoadedMonSpecialExp
 	call PrintNumber
 	ret
-
+	
 BackupLoadedMonExp:
 	push bc
 	push de
 	push hl
-
 	ld b, 0
 	ld c, 3
 	ld hl, wLoadedMonExp
 	ld de, wBuffer
 	call CopyData
-
 	pop hl
 	pop de
 	pop bc
@@ -743,13 +768,11 @@ RestoreLoadedMonExp:
 	push bc
 	push de
 	push hl
-
 	ld b, 0
 	ld c, 3
 	ld hl, wBuffer
 	ld de, wLoadedMonExp
 	call CopyData
-
 	pop hl
 	pop de
 	pop bc
@@ -763,3 +786,31 @@ AttackString:  db "ATK@"
 DefenseString: db "DEF@"
 SpeedString:   db "SPD@"
 SpecialString: db "SPC@"
+DebugString:   db "DEBUG STR@"
+; NUEVO TERCERA VENTANA DE STATS
+
+; NUEVO PARA GENEROS
+PrintGenderStatusScreen:
+	ld a, [wLoadedMonSpecies]
+	ld [wd11e], a
+	ld de, wLoadedMonDVs
+	callba GetMonGender
+	ld a, [wd11e]
+	and a
+	jr z, .noGender
+	dec a
+	jr z, .male
+	; else female
+	ld a, "♀"
+	jr .printSymbol
+.male
+	ld a, "♂"
+	jr .printSymbol
+.noGender
+	ld a, " "
+.printSymbol
+	coord hl, 17, 2
+	ld [hl], a
+	ret
+; NUEVO PARA GENEROS
+

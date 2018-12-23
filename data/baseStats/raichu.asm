@@ -2,7 +2,7 @@ db DEX_RAICHU ; pokedex id
 db 60 ; base hp
 db 90 ; base attack
 db 55 ; base defense
-db 100 ; base speed
+db 110 ; base speed
 db 90 ; base special
 db ELECTRIC ; species type 1
 db ELECTRIC ; species type 2
@@ -24,5 +24,5 @@ db 0 ; growth rate
 	tmlearn 25,31,32
 	tmlearn 33,34,39,40
 	tmlearn 44,45
-	tmlearn 50,55
-db 0 ; padding
+	tmlearn 50,52,53,55
+db BANK(RaichuPicFront)

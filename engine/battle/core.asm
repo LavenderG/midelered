@@ -1,3 +1,5 @@
+__DEBUG_RUN__ = 1  ; NUEVO PARA DEBUG VER STATS DEL ENEMIGO
+
 BattleCore:
 
 ; These are move effects (second value from the Moves table in bank $E).
@@ -184,6 +186,17 @@ SlidePlayerAndEnemySilhouettesOnScreen:
 	inc a
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call Delay3
+	; NUEVO PARA SHINY
+	ld de, wEnemyMonDVs
+	callba IsMonShiny
+	ld hl, wShinyMonFlag
+	jr nz, .shiny
+	res 0, [hl]
+	jr .setPal
+.shiny
+	set 0, [hl]
+.setPal
+; NUEVO PARA SHINY
 	ld b, SET_PAL_BATTLE
 	call RunPaletteCommand
 	call HideSprites
@@ -221,6 +234,10 @@ SetScrollXForSlidingPlayerBodyLeft:
 
 StartBattle:
 	xor a
+	; NUEVO PARA SKETCH
+    ld [wBattlePreviousEnemyAttack], a
+	ld [wBattlePreviousPlayerAttack], a
+	; NUEVO PARA SKETCH
 	ld [wPartyGainExpFlags], a
 	ld [wPartyFoughtCurrentEnemyFlags], a
 	ld [wActionResultOrTookBattleTurn], a
@@ -1461,9 +1478,7 @@ EnemySendOutFirstMon:
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
 	jr z, .next4
-	ld a, [wOptions]
-	bit 6, a
-	jr nz, .next4
+	jr .next4 ; NUEVO, SET
 	ld hl, TrainerAboutToUseText
 	call PrintText
 	coord hl, 0, 7
@@ -1519,6 +1534,15 @@ EnemySendOutFirstMon:
 	ld [hStartTileID], a
 	coord hl, 15, 6
 	predef AnimateSendingOutMon
+	; NUEVO PARA SHINY
+	ld de, wEnemyMonDVs
+	callba IsMonShiny
+	jr z, .noFlash
+    ld hl, wShinyMonFlag
+    set 1, [hl]
+	callba PlayShinySparkleAnimation
+.noFlash
+; NUEVO PARA SHINY
 	ld a, [wEnemyMonSpecies2]
 	call PlayCry
 	call DrawEnemyHUDAndHPBar
@@ -1664,6 +1688,11 @@ TryRunningFromBattle:
 .trainerBattle
 	ld hl, NoRunningText
 .printCantEscapeOrNoRunningText
+; NUEVO PARA DEBUG VER STATS DEL ENEMIGO
+IF __DEBUG_RUN__ == 1
+	call DebugEnemyStats
+ENDC
+; NUEVO PARA DEBUG VER STATS DEL ENEMIGO
 	call PrintText
 	ld a, 1
 	ld [wForcePlayerToChooseMon], a
@@ -1849,6 +1878,15 @@ SendOutMon:
 	call PlayMoveAnimation
 	coord hl, 4, 11
 	predef AnimateSendingOutMon
+	; NUEVO PARA SHINY
+	ld de, wBattleMonDVs
+	callba IsMonShiny
+    jr z, .noFlash
+    ld hl, wShinyMonFlag
+	res 1, [hl]
+	callba PlayShinySparkleAnimation
+.noFlash
+; NUEVO PARA SHINY
 	ld a, [wcf91]
 	call PlayCry
 	call PrintEmptyString
@@ -1913,6 +1951,9 @@ DrawPlayerHUDAndHPBar:
 	coord hl, 10, 7
 	call CenterMonName
 	call PlaceString
+	call PrintPlayerMonGender ; NUEVO PARA GENEROS
+	call PrintPlayerMonShiny ; NUEVO PARA SHINY
+	call PrintEXPBar ; NUEVO PARA BATTLE EXP
 	ld hl, wBattleMonSpecies
 	ld de, wLoadedMon
 	ld bc, wBattleMonDVs - wBattleMonSpecies
@@ -1921,13 +1962,14 @@ DrawPlayerHUDAndHPBar:
 	ld de, wLoadedMonLevel
 	ld bc, wBattleMonPP - wBattleMonLevel
 	call CopyData
-	coord hl, 14, 8
+	; NO SE HA HECHO NADA NUEVO PARA SHINY AL FINAL, NO SE PONE ESTO ABAJO coord hl, 13, 8 PORQUE NO SE MUESTRA EL ESTADO ALTERADO
+    coord hl, 10, 8 ;coord hl, 14, 8  ; NUEVO MODIFICADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	push hl
 	inc hl
 	ld de, wLoadedMonStatus
 	call PrintStatusConditionNotFainted
 	pop hl
-	jr nz, .doNotPrintLevel
+	coord hl, 14, 8;jr nz, .doNotPrintLevel  ; NUEVO MODIFICADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	call PrintLevel
 .doNotPrintLevel
 	ld a, [wLoadedMonSpecies]
@@ -1972,17 +2014,25 @@ DrawEnemyHUDAndHPBar:
 	coord hl, 1, 0
 	call CenterMonName
 	call PlaceString
-	coord hl, 4, 1
+	call PrintEnemyMonGender ; NUEVO PARA GENEROS
+	call PrintEnemyMonShiny ; NUEVO PARA SHINY
+	;NUEVO MODIFICADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
+	;coord hl, 6, 1 ; antes era coord hl, 4, 1  ESTO ES PARA BATTLE EXP
+	coord hl, 2, 1 ;
+	;NUEVO MODIFICADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	push hl
 	inc hl
 	ld de, wEnemyMonStatus
 	call PrintStatusConditionNotFainted
 	pop hl
-	jr nz, .skipPrintLevel ; if the mon has a status condition, skip printing the level
+	;NUEVO BORRADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
+	;jr nz, .skipPrintLevel ; if the mon has a status condition, skip printing the level
+	; NUEVO BORRADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	ld a, [wEnemyMonLevel]
 	ld [wLoadedMonLevel], a
+	coord hl, 6, 1 ;NUEVO MODIFICADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	call PrintLevel
-.skipPrintLevel
+;.skipPrintLevel  ;NUEVO BORRADO PARA MOSTRAR NIVEL Y ESTADO ALTERADO
 	ld hl, wEnemyMonHP
 	ld a, [hli]
 	ld [H_MULTIPLICAND + 1], a
@@ -2454,7 +2504,7 @@ PartyMenuOrRockOrRun:
 ; display the two status screens
 	predef StatusScreen
 	predef StatusScreen2
-	predef StatusScreen3
+	predef StatusScreen3 ; NUEVO PARA TERCERA VENTANA DE STATS
 ; now we need to reload the enemy mon pic
 	ld a, [wEnemyBattleStatus2]
 	bit HAS_SUBSTITUTE_UP, a ; does the enemy mon have a substitute?
@@ -3136,6 +3186,7 @@ ExecutePlayerMove:
 	xor a
 	ld [H_WHOSETURN], a ; set player's turn
 	ld a, [wPlayerSelectedMove]
+	ld [wBattlePreviousPlayerAttack], a ; NUEVO PARA SKETCH
 	inc a
 	jp z, ExecutePlayerMoveDone ; for selected move = FF, skip most of player's turn
 	xor a
@@ -4675,6 +4726,7 @@ UnusedHighCriticalMoves:
 	db RAZOR_LEAF
 	db CRABHAMMER
 	db SLASH
+	db NIGHT_SLASH
 	db $FF
 
 ; determines if attack is a critical hit
@@ -4752,6 +4804,7 @@ HighCriticalMoves:
 	db RAZOR_LEAF
 	db CRABHAMMER
 	db SLASH
+	db NIGHT_SLASH
 	db $FF
 
 
@@ -5332,6 +5385,8 @@ AdjustDamageForMoveType:
 	ld [wDamage], a
 	ld a, l
 	ld [wDamage + 1], a
+; multiply by 3/2
+
 	ld hl, wDamageMultipliers
 	set 7, [hl]
 .skipSameTypeAttackBonus
@@ -5355,11 +5410,14 @@ AdjustDamageForMoveType:
 	push hl
 	push bc
 	inc hl
+
 	ld a, [wDamageMultipliers]
 	and $80
 	ld b, a
+
 	ld a, [hl] ; a = damage multiplier
 	ld [H_MULTIPLIER], a
+
 	add b
 	ld [wDamageMultipliers], a
 	xor a
@@ -5369,6 +5427,7 @@ AdjustDamageForMoveType:
 	ld [H_MULTIPLICAND + 1], a
 	ld a, [hld]
 	ld [H_MULTIPLICAND + 2], a
+
 	call Multiply
 	ld a, 10
 	ld [H_DIVISOR], a
@@ -5387,6 +5446,7 @@ AdjustDamageForMoveType:
 	inc a
 	ld [wMoveMissed], a
 .skipTypeImmunity
+
 	pop bc
 	pop hl
 .nextTypePair
@@ -5397,43 +5457,104 @@ AdjustDamageForMoveType:
 	ret
 
 ; function to tell how effective the type of an enemy attack is on the player's current pokemon
-; this doesn't take into account the effects that dual types can have
-; (e.g. 4x weakness / resistance, weaknesses and resistances canceling)
+;; this doesn't take into account the effects that dual types can have
+;; (e.g. 4x weakness / resistance, weaknesses and resistances canceling)
+; modified to take dual types into effect  ; NUEVO PARA AI DE ENTRENADORES
 ; the result is stored in [wTypeEffectiveness]
-; ($05 is not very effective, $10 is neutral, $14 is super effective)
+;; ($05 is not very effective, $10 is neutral, $14 is super effective)
+; ($00 immune; $02 or $05 NVE; $0a neutral; $14 or $28 SE)  ; NUEVO PARA AI DE ENTRENADORES
 ; as far is can tell, this is only used once in some AI code to help decide which move to use
 AIGetTypeEffectiveness:
 	ld a, [wEnemyMoveType]
 	ld d, a                    ; d = type of enemy move
 	ld hl, wBattleMonType
 	ld b, [hl]                 ; b = type 1 of player's pokemon
-	inc hl
-	ld c, [hl]                 ; c = type 2 of player's pokemon
-	ld a, $10
-	ld [wTypeEffectiveness], a ; initialize to neutral effectiveness
+	; NUEVO PARA AI DE ENTRENADORES
+	;inc hl
+	;ld c, [hl]                 ; c = type 2 of player's pokemon
+	;ld a, $10
+	;ld [wTypeEffectiveness], a ; initialize to neutral effectiveness
+	ld a,10
+	ld [H_MULTIPLIER],a           ; initialize [wd11e] to neutral effectiveness
+	; NUEVO PARA AI DE ENTRENADORES
 	ld hl, TypeEffects
 .loop
 	ld a, [hli]
 	cp $ff
-	ret z
+	; NUEVO PARA AI DE ENTRENADORES
+	jr z, .start2
+	;ret z
+	; NUEVO PARA AI DE ENTRENADORES
 	cp d                      ; match the type of the move
 	jr nz, .nextTypePair1
 	ld a, [hli]
 	cp b                      ; match with type 1 of pokemon
-	jr z, .done
-	cp c                      ; or match with type 2 of pokemon
-	jr z, .done
+	; NUEVO PARA AI DE ENTRENADORES
+	jr z,.match
+	;jr z, .done
+	;cp c                      ; or match with type 2 of pokemon
+	;jr z, .done
+	; NUEVO PARA AI DE ENTRENADORES
 	jr .nextTypePair2
 .nextTypePair1
 	inc hl
 .nextTypePair2
 	inc hl
 	jr .loop
-.done
+; NUEVO PARA AI DE ENTRENADORES
+.match
+;.done
+; NUEVO PARA AI DE ENTRENADORES
 	ld a, [hl]
-	ld [wTypeEffectiveness], a ; store damage multiplier
+	; NUEVO PARA AI DE ENTRENADORES
+	;ld [wTypeEffectiveness], a ; store damage multiplier
+	ld [H_MULTIPLIER],a           ; store damage multiplier
+.start2
+    ld hl,wBattleMonType+1
+    ld a,[hl]
+    cp b
+    jr nz,.checksecondtype
+    ld a, [H_MULTIPLIER]
+    ld [wd11e], a
+	; NUEVO PARA AI DE ENTRENADORES
 	ret
-
+; NUEVO PARA AI DE ENTRENADORES
+.checksecondtype
+    ld b,[hl]
+    xor a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND+1],a
+    ld a,10
+    ld [H_MULTIPLICAND+2],a
+    ld hl,TypeEffects
+.loop2
+    ld a,[hli]
+    cp a,$ff
+    jr z,.multandret
+    cp d ; match the type
+    jr nz, .nextTypePair3
+    ld a,[hli]
+    cp b ; match with type 2 of pokemon
+    jr z,.match2
+    jr .nextTypePair4
+.nextTypePair3
+    inc hl
+.nextTypePair4
+    inc hl
+    jr .loop2
+.match2
+    ld a,[hl]
+    ld [H_MULTIPLICAND+2],a
+.multandret
+    call Multiply
+    ld a, 10
+    ld [H_DIVISOR], a
+    ld b, 4
+    call Divide
+    ld a, [H_QUOTIENT+3]
+    ld [wd11e], a
+    ret
+; NUEVO PARA AI DE ENTRENADORES
 INCLUDE "data/type_effects.asm"
 
 ; some tests that need to pass for a move to hit
@@ -5532,6 +5653,12 @@ MoveHitTest:
 	ld b, a
 .doAccuracyCheck
 ; if the random number generated is greater than or equal to the scaled accuracy, the move misses
+; NUEVO PARA QUE NO FALLEN ATAQUES DE 100% PREC
+; if the move is 100% accurate, don't miss
+	ld a, b
+	cp $FF
+	ret z
+; NUEVO PARA QUE NO FALLEN ATAQUES DE 100% PREC
 ; note that this means that even the highest accuracy is still just a 255/256 chance, not 100%
 	call BattleRandom
 	cp b
@@ -5668,6 +5795,7 @@ RandomizeDamage:
 ; for more detailed commentary, see equivalent function for player side (ExecutePlayerMove)
 ExecuteEnemyMove:
 	ld a, [wEnemySelectedMove]
+	ld [wBattlePreviousEnemyAttack], a ; NUEVO PARA SKETCH
 	inc a
 	jp z, ExecuteEnemyMoveDone
 	call PrintGhostText
@@ -6215,7 +6343,7 @@ LoadEnemyMonData:
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?
 ; fixed DVs for trainer mon
-	ld a, $FF
+    ld a, $FF
 	ld b, $FF
 	jr z, .storeDVs
 ; random DVs for wild mon
@@ -6230,26 +6358,36 @@ LoadEnemyMonData:
 	ld a, [wCurEnemyLVL]
 	ld [de], a
 	inc de
+	; NUEVO PARA ENTRENADORES MAX EVS
+	;ld b, $0
 	ld a, [wIsInBattle]
+	; NUEVO PARA ARREGLAR BUG DE HP DE POKES REGALADOS POR EL CAMBIO DE LOS EVS/IVS DE ENTRENADOR
+	;dec a
 	cp 1 ; if trainer battle, not use stat exp
 	jr z, .not_use_stat_exp
 	and a ; if no battle, not use stat exp
+	; NUEVO PARA ARREGLAR BUG DE HP DE POKES REGALADOS POR EL CAMBIO DE LOS EVS/IVS DE ENTRENADOR
 	jr z, .not_use_stat_exp
 	ld a, $1 ; use stat experience in calculation
-	jr .stat_exp_calc
+	jr .stat_exp_calc 	; NUEVO PARA ARREGLAR BUG DE HP DE POKES REGALADOS POR EL CAMBIO DE LOS EVS/IVS DE ENTRENADOR
 .not_use_stat_exp
-	ld a, $0
-.stat_exp_calc
+    ld a, $0 ; NUEVO PARA ARREGLAR BUG DE HP DE POKES REGALADOS POR EL CAMBIO DE LOS EVS/IVS DE ENTRENADOR
+.stat_exp_calc ; NUEVO PARA ARREGLAR BUG DE HP DE POKES REGALADOS POR EL CAMBIO DE LOS EVS/IVS DE ENTRENADOR
 	ld b, a
+	; NUEVO PARA ENTRENADORES MAX EVS
 	ld hl, wEnemyMonHP
 	push hl
-	; if wild battle or no battle, calc stats from cur enemy
+    ; if wild battle or no battle, calc stats from cur enemy  ; esto ya no: if wild battle, calc stats from cur enemy
 	; else calc stats from party enemy
 	ld a, [wIsInBattle]
+	; NUEVO PARA ARREGLAR BUG DE HP DE POKES REGALADOS POR EL CAMBIO DE LOS EVS/IVS DE ENTRENADOR
+	;dec a
 	cp 1 ; wild battle
 	jr z, .calc_stats
 	and a ; no battle
+	; NUEVO PARA ARREGLAR BUG DE HP DE POKES REGALADOS POR EL CAMBIO DE LOS EVS/IVS DE ENTRENADOR
 	jr z, .calc_stats
+	; NUEVO PARA ENTRENADORES MAX EVS
 	push bc
 	push de
 	ld hl, wEnemyMon1HPExp - 1
@@ -6259,6 +6397,7 @@ LoadEnemyMonData:
 	pop de
 	pop bc
 .calc_stats
+	; NUEVO PARA ENTRENADORES MAX EVS
 	call CalcStats
 	pop hl
 	ld a, [wIsInBattle]
@@ -6686,57 +6825,59 @@ CalculateModifiedStat:
 	ret
 
 ApplyBadgeStatBoosts:
-	ld a, [wLinkState]
-	cp LINK_STATE_BATTLING
-	ret z ; return if link battle
-	ld a, [wObtainedBadges]
-	ld b, a
-	ld hl, wBattleMonAttack
-	ld c, $4
+; NUEVO PARA ELIMINAR BOOST DE MEDALLAS
+;	ld a, [wLinkState]
+;	cp LINK_STATE_BATTLING
+;	ret z ; return if link battle
+;	ld a, [wObtainedBadges]
+;	ld b, a
+;	ld hl, wBattleMonAttack
+;	ld c, $4
 ; the boost is applied for badges whose bit position is even
 ; the order of boosts matches the order they are laid out in RAM
 ; Boulder (bit 0) - attack
 ; Thunder (bit 2) - defense
 ; Soul (bit 4) - speed
 ; Volcano (bit 6) - special
-.loop
-	srl b
-	call c, .applyBoostToStat
-	inc hl
-	inc hl
-	srl b
-	dec c
-	jr nz, .loop
-	ret
+;.loop
+;	srl b
+;	call c, .applyBoostToStat
+;	inc hl
+;	inc hl
+;	srl b
+;	dec c
+;	jr nz, .loop
+;	ret
 
 ; multiply stat at hl by 1.125
 ; cap stat at 999
-.applyBoostToStat
-	ld a, [hli]
-	ld d, a
-	ld e, [hl]
-	srl d
-	rr e
-	srl d
-	rr e
-	srl d
-	rr e
-	ld a, [hl]
-	add e
-	ld [hld], a
-	ld a, [hl]
-	adc d
-	ld [hli], a
-	ld a, [hld]
-	sub 999 % $100
-	ld a, [hl]
-	sbc 999 / $100
-	ret c
-	ld a, 999 / $100
-	ld [hli], a
-	ld a, 999 % $100
-	ld [hld], a
+;.applyBoostToStat
+;	ld a, [hli]
+;	ld d, a
+;	ld e, [hl]
+;	srl d
+;	rr e
+;	srl d
+;	rr e
+;	srl d
+;	rr e
+;	ld a, [hl]
+;	add e
+;	ld [hld], a
+;	ld a, [hl]
+;	adc d
+;	ld [hli], a
+;	ld a, [hld]
+;	sub 999 % $100
+;	ld a, [hl]
+;	sbc 999 / $100
+;	ret c
+;	ld a, 999 / $100
+;	ld [hli], a
+;	ld a, 999 % $100
+;	ld [hld], a
 	ret
+; NUEVO PARA ELIMINAR BOOST DE MEDALLAS
 
 LoadHudAndHpBarAndStatusTilePatterns:
 	call LoadHpBarAndStatusTilePatterns
@@ -6886,6 +7027,10 @@ DetermineWildOpponent:
 	callab TryDoWildEncounter
 	ret nz
 InitBattleCommon:
+; NUEVO PARA SHINY
+    xor a
+	ld [wNextEncounterSpecies], a
+	; NUEVO PARA SHINY
 	ld a, [wMapPalOffset]
 	push af
 	ld hl, wLetterPrintingDelayFlags
@@ -7255,6 +7400,7 @@ MoveEffectPointerTable:
 	 dw LeechSeedEffect           ; LEECH_SEED_EFFECT
 	 dw SplashEffect              ; SPLASH_EFFECT
 	 dw DisableEffect             ; DISABLE_EFFECT
+	 dw SketchEffect              ; SKETCH_EFFECT ; NUEVO PARA SKETCH
 
 SleepEffect:
 	ld de, wEnemyMonStatus
@@ -7326,9 +7472,17 @@ PoisonEffect:
 	ld a, [hli]
 	cp POISON ; can't poison a poison-type target
 	jr z, .noEffect
+	; NUEVO PARA NUEVOS TIPOS
+	cp STEEL ; can't poison a steel-type target
+	jr z, .noEffect
+	; NUEVO PARA NUEVOS TIPOS
 	ld a, [hld]
 	cp POISON ; can't poison a poison-type target
 	jr z, .noEffect
+	; NUEVO PARA NUEVOS TIPOS
+	cp STEEL ; can't poison a steel-type target
+	jr z, .noEffect
+	; NUEVO PARA NUEVOS TIPOS
 	ld a, [de]
 	cp POISON_SIDE_EFFECT1
 	ld b, $34 ; ~20% chance of poisoning
@@ -8632,6 +8786,11 @@ HealEffect:
 TransformEffect:
 	jpab TransformEffect_
 
+; NUEVO PARA SKETCH
+SketchEffect:
+	jpab SketchEffect_
+	; NUEVO PARA SKETCH
+
 ReflectLightScreenEffect:
 	jpab ReflectLightScreenEffect_
 
@@ -8744,3 +8903,173 @@ PlayBattleAnimationGotID:
 	pop de
 	pop hl
 	ret
+
+; NUEVO PARA GENEROS
+PrintEnemyMonGender:
+; draw a male, female, or blank symbol for the Enemy 'mon
+	ld a, [wEnemyMonSpecies]
+	ld de, wEnemyMonDVs
+	call PrintGenderCommon
+	coord hl, 9, 1
+	ld [hl], a
+	ret
+PrintPlayerMonGender:
+; draw a male, female, or blank symbol for the Player 'mon
+	ld a, [wBattleMonSpecies]
+	ld de, wBattleMonDVs
+	call PrintGenderCommon
+	coord hl, 17, 8
+	ld [hl], a
+	ret
+PrintGenderCommon: ; used by both routines
+	ld [wd11e], a
+	callba GetMonGender
+	ld a, [wd11e]
+	and a
+	jr z, .noGender
+	dec a
+	jr z, .male
+	; else female
+	ld a, "♀"
+	ret
+.male
+	ld a, "♂"
+	ret
+.noGender
+	ld a, " "
+	ret
+; NUEVO PARA GENEROS
+
+; NUEVO PARA SHINY
+PrintPlayerMonShiny:
+	ld de, wBattleMonDVs
+	coord hl, 11, 8
+	jr PrintShinyCommon
+PrintEnemyMonShiny:
+	ld de, wEnemyMonDVs
+	coord hl, 2, 1
+PrintShinyCommon:
+	push hl
+	callba IsMonShiny
+	jr z, .notShiny
+	ld a, "⁂"
+	jr .ok
+.notShiny
+	ld a, " "
+.ok
+	pop hl
+	ld [hl], a
+	ret
+; NUEVO PARA SHINY
+
+;NUEVO PARA DEBUG VER STATS DEL ENEMIGO
+IF __DEBUG_RUN__ == 1
+DebugEnemyStats:
+	call DebugEnemyPrintLabels
+	call DebugEnemyPrintStats
+	call DebugEnemyPrintStatExperience
+	ret
+DebugEnemyPrintLabels:
+	push de
+	push hl
+	; Enemy stats
+	coord hl, 2, 2
+	ld de, .EnemyString
+	call PlaceString
+	; HP
+	coord hl, 2, 4
+	ld de, .HPString
+	call PlaceString
+	; ATK
+	coord hl, 2, 5
+	ld de, .AttackString
+	call PlaceString
+	; DEF
+	coord hl, 2, 6
+	ld de, .DefenseString
+	call PlaceString
+	; SPD
+	coord hl, 2, 7
+	ld de, .SpeedString
+	call PlaceString
+	; SPC
+	coord hl, 2, 8
+	ld de, .SpecialString
+	call PlaceString
+	pop hl
+	pop de
+	ret
+.EnemyString:   db "ENEMY STATS@"
+.HPString:      db "HP@"
+.AttackString:  db "ATK@"
+.DefenseString: db "DEF@"
+.SpeedString:   db "SPD@"
+.SpecialString: db "SPC@"
+DebugEnemyPrintStats:
+	push bc
+	push de
+	push hl
+	lb bc, LEADING_ZEROES | 2, 3
+	; HP
+	coord hl, 6, 4
+	ld de, wEnemyMonHP
+	call PrintNumber
+	; MAX HP
+	coord hl, 10, 4
+	ld de, wEnemyMonMaxHP
+	call PrintNumber
+	; ATK
+	coord hl, 6, 5
+	ld de, wEnemyMonAttack
+	call PrintNumber
+	; DEF
+	coord hl, 6, 6
+	ld de, wEnemyMonDefense
+	call PrintNumber
+	; SPD
+	coord hl, 6, 7
+	ld de, wEnemyMonSpeed
+	call PrintNumber
+	; SPC
+	coord hl, 6, 8
+	ld de, wEnemyMonSpecial
+	call PrintNumber
+	pop hl
+	pop de
+	pop bc
+	ret
+DebugEnemyPrintStatExperience:
+	push bc
+	push de
+	push hl
+	lb bc, LEADING_ZEROES | 2, 5
+	; HP
+	coord hl, 14, 4
+	ld de, wEnemyMon1HPExp
+	call PrintNumber
+	; ATK
+	coord hl, 14, 5
+	ld de, wEnemyMon1AttackExp
+	call PrintNumber
+	; DEF
+	coord hl, 14, 6
+	ld de, wEnemyMon1DefenseExp
+	call PrintNumber
+	; SPD
+	coord hl, 14, 7
+	ld de, wEnemyMon1SpeedExp
+	call PrintNumber
+	; SPC
+	coord hl, 14, 8
+	ld de, wEnemyMon1SpecialExp
+	call PrintNumber
+	; DVs
+	coord hl, 14, 9
+	ld de, wEnemyMon1DVs
+	call PrintNumber
+	pop hl
+	pop de
+	pop bc
+	ret
+ENDC
+;NUEVO PARA DEBUG VER STATS DEL ENEMIGO

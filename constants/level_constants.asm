@@ -1,5 +1,4 @@
 ; Trainer levels constants
-
 BROCK_LEVEL    EQU 15
 MISTY_LEVEL    EQU 20
 SURGE_LEVEL    EQU 25

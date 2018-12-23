@@ -4,7 +4,7 @@ DisplayEffectiveness:
 	cp $0A
 	ret z
 	ld hl, SuperEffectiveText
-	jr nc, .done
+	jr nc, .done  
 	ld hl, NotVeryEffectiveText
 .done
 	jp PrintText

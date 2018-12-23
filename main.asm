@@ -10,6 +10,10 @@ PICS_2 EQU $A
 PICS_3 EQU $B
 PICS_4 EQU $C
 PICS_5 EQU $D
+PICS_6 EQU $3F
+PICS_7 EQU $4A
+PICS_8 EQU $4B
+PICS_9 EQU $4C
 
 INCLUDE "home.asm"
 
@@ -22,7 +26,6 @@ INCLUDE "engine/black_out.asm"
 
 MewPicFront:: INCBIN "pic/bmon/mew.pic"
 MewPicBack::  INCBIN "pic/monback/mewb.pic"
-INCLUDE "data/baseStats/mew.asm"
 
 INCLUDE "engine/battle/safari_zone.asm"
 
@@ -205,6 +208,14 @@ INCLUDE "engine/battle/moveEffects/haze_effect.asm"
 INCLUDE "engine/battle/get_trainer_name.asm"
 INCLUDE "engine/random.asm"
 
+; NUEVO PARA BATTLE EXP
+EXPBarGraphics: INCBIN "gfx/exp_bar.h8.2bpp"
+;EXPBarGraphicsEnd:
+; NUEVO PARA BATTLE EXP
+; NUEVO PARA SHINY , BORRADO EL EXP DE ARRIBA
+ShinySparkleGraphics:           INCBIN "gfx/shiny_sparkle.2bpp"
+EXPBarShinySparkleGraphicsEnd:
+; NUEVO PARA SHINY
 
 SECTION "NPC Sprites 2", ROMX, BANK[NPC_SPRITES_2]
 
@@ -887,9 +898,6 @@ INCLUDE "engine/game_corner_slots.asm"
 
 SECTION "bankE",ROMX,BANK[$E]
 
-INCLUDE "data/moves.asm"
-BaseStats: INCLUDE "data/base_stats.asm"
-INCLUDE "data/cries.asm"
 INCLUDE "engine/battle/unused_stats_functions.asm"
 INCLUDE "engine/battle/scroll_draw_trainer_pic.asm"
 INCLUDE "engine/battle/trainer_ai.asm"
@@ -904,15 +912,48 @@ TradingAnimationGraphicsEnd:
 TradingAnimationGraphics2: INCBIN "gfx/trade2.2bpp"
 TradingAnimationGraphics2End:
 
-INCLUDE "engine/evos_moves.asm"
 INCLUDE "engine/battle/moveEffects/heal_effect.asm"
 INCLUDE "engine/battle/moveEffects/transform_effect.asm"
 INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm"
 
+INCLUDE "engine/battle/moveEffects/sketch_effect.asm"
+
+; NUEVO PARA BATTLE EXP
+EnemyHealthBarUpdated:
+	ld [hl], $72
+	ld a, [wIsInBattle]
+	dec a
+	jr nz, .noBattle
+	push hl
+	ld a, [wEnemyMon]
+	ld [wd11e], a
+	ld hl, IndexToPokedex
+	ld b, BANK(IndexToPokedex)
+	call Bankswitch
+	ld a, [wd11e]
+	dec a
+	ld c, a
+	ld b, $2
+	ld hl, wPokedexOwned
+	predef FlagActionPredef
+	ld a, c
+	and a
+	jr z, .notOwned
+	coord hl, 1, 1
+	ld [hl], $E9
+.notOwned
+	pop hl
+.noBattle
+	ld de, $0001
+	jp HealthBarUpdateDone
+; NUEVO PARA BATTLE EXP
 
 SECTION "bankF",ROMX,BANK[$F]
+INCLUDE "data/moves.asm"
+BaseStats: INCLUDE "data/base_stats.asm"
+INCLUDE "data/cries.asm"
 
-INCLUDE "engine/battle/core.asm"
+INCLUDE "engine/evos_moves.asm"
 
 
 SECTION "bank10",ROMX,BANK[$10]
@@ -1251,20 +1292,24 @@ SECTION "bank13",ROMX,BANK[$13]
 
 TrainerPics::
 YoungsterPic::     INCBIN "pic/trainer/youngster.pic"
-BugCatcherPic::    INCBIN "pic/trainer/bugcatcher.pic"
+BugCatcherPic::    
+UtalaweaPic::      INCBIN "pic/trainer/bugcatcher.pic"
 LassPic::          INCBIN "pic/trainer/lass.pic"
 SailorPic::        INCBIN "pic/trainer/sailor.pic"
 JrTrainerMPic::    INCBIN "pic/trainer/jr.trainerm.pic"
 JrTrainerFPic::    INCBIN "pic/trainer/jr.trainerf.pic"
 PokemaniacPic::    INCBIN "pic/trainer/pokemaniac.pic"
-SuperNerdPic::     INCBIN "pic/trainer/supernerd.pic"
+SuperNerdPic::
+DarkiPic::   
+GoldyPic::         INCBIN "pic/trainer/supernerd.pic"
 HikerPic::         INCBIN "pic/trainer/hiker.pic"
 BikerPic::         INCBIN "pic/trainer/biker.pic"
 BurglarPic::       INCBIN "pic/trainer/burglar.pic"
 EngineerPic::      INCBIN "pic/trainer/engineer.pic"
 FisherPic::        INCBIN "pic/trainer/fisher.pic"
 SwimmerPic::       INCBIN "pic/trainer/swimmer.pic"
-CueBallPic::       INCBIN "pic/trainer/cueball.pic"
+CueBallPic::  
+JavisitPic::       INCBIN "pic/trainer/cueball.pic"
 GamblerPic::       INCBIN "pic/trainer/gambler.pic"
 BeautyPic::        INCBIN "pic/trainer/beauty.pic"
 PsychicPic::       INCBIN "pic/trainer/psychic.pic"
@@ -1276,10 +1321,12 @@ BlackbeltPic::     INCBIN "pic/trainer/blackbelt.pic"
 Rival1Pic::        INCBIN "pic/trainer/rival1.pic"
 ProfOakPic::       INCBIN "pic/trainer/prof.oak.pic"
 ChiefPic::
-ScientistPic::     INCBIN "pic/trainer/scientist.pic"
+ScientistPic::
+ManecPic::         INCBIN "pic/trainer/scientist.pic"
 GiovanniPic::      INCBIN "pic/trainer/giovanni.pic"
 RocketPic::        INCBIN "pic/trainer/rocket.pic"
-CooltrainerMPic::  INCBIN "pic/trainer/cooltrainerm.pic"
+CooltrainerMPic::  
+EeveetoPic:        INCBIN "pic/trainer/cooltrainerm.pic"
 CooltrainerFPic::  INCBIN "pic/trainer/cooltrainerf.pic"
 BrunoPic::         INCBIN "pic/trainer/bruno.pic"
 BrockPic::         INCBIN "pic/trainer/brock.pic"
@@ -1295,7 +1342,8 @@ Rival3Pic::        INCBIN "pic/trainer/rival3.pic"
 LoreleiPic::       INCBIN "pic/trainer/lorelei.pic"
 ChannelerPic::     INCBIN "pic/trainer/channeler.pic"
 AgathaPic::        INCBIN "pic/trainer/agatha.pic"
-LancePic::         INCBIN "pic/trainer/lance.pic"
+LancePic::
+RaguPic::          INCBIN "pic/trainer/lance.pic"
 
 INCLUDE "data/mapHeaders/tradecenter.asm"
 INCLUDE "scripts/tradecenter.asm"
@@ -1481,6 +1529,120 @@ INCLUDE "engine/menu/diploma.asm"
 
 INCLUDE "engine/overworld/trainers.asm"
 
+; NUEVO PARA BATTLE EXP
+AnimateEXPBarAgain:
+	call LoadMonData
+	call IsCurrentMonBattleMon
+	ret nz
+	xor a
+	ld [wEXPBarPixelLength], a
+	coord hl, 17, 11
+	ld a, $c0
+	ld c, $08
+.loop
+	ld [hld], a
+	dec c
+	jr nz, .loop
+AnimateEXPBar:
+	call LoadMonData
+	call IsCurrentMonBattleMon
+	ret nz
+	ld a, SFX_HEAL_HP
+	;ld a, (SFX_02_3d - SFX_Headers_02) / 3 ; HP healing sound
+	call PlaySoundWaitForCurrent
+	ld hl, CalcEXPBarPixelLength
+	ld b, BANK(CalcEXPBarPixelLength)
+	call Bankswitch
+	ld a, [wEXPBarPixelLength]
+	ld b, a
+	ld a, [H_QUOTIENT + 3]
+	sub b
+	jr z, .done
+	ld b, a
+	ld c, $08
+	coord hl, 17, 11
+.loop1
+	ld a, [hl]
+	cp $c8
+	jr nz, .loop2
+	dec hl
+	dec c
+	jr z, .done
+	jr .loop1
+.loop2
+	inc a
+	ld [hl], a
+	call DelayFrame
+	dec b
+	jr z, .done
+	jr .loop1
+.done
+	ld bc, $08
+	coord hl, 10, 11
+	ld de, wTileMapBackup + 10 + 11 * 20
+	call CopyData
+	ld c, $20
+	jp DelayFrames
+KeepEXPBarFull:
+	call IsCurrentMonBattleMon
+	ret nz
+	ld a, [wEXPBarKeepFullFlag]
+	set 0, a
+	ld [wEXPBarKeepFullFlag], a
+	ld a, [wCurEnemyLVL]
+	ret
+IsCurrentMonBattleMon:
+	ld a, [wPlayerMonNumber]
+	ld b, a
+	ld a, [wWhichPokemon]
+	cp b
+	ret
+; NUEVO PARA BATTLE EXP
+
+; NUEVO PARA SHINY
+IsMonShiny:
+	ld h, d
+	ld l, e
+	; attack DV >= 10?
+	ld a, [hl]
+	and $f0
+	cp 10 << 4
+	jr c, .notShiny
+	; defense DV >= 10?
+	ld a, [hli]
+	and $f
+	cp 10
+	jr c, .notShiny
+	; speed DV >= 10?
+	ld a, [hl]
+	and $f0
+	cp 10 << 4
+	jr c, .notShiny
+	; special DV >= 10?
+	ld a, [hl]
+	and $f
+	cp 10
+	jr c, .notShiny
+	and a
+	ret
+.notShiny
+	xor a
+	ret
+_EvolutionSetWholeScreenPalette:
+	ld hl, wShinyMonFlag
+	res 0, [hl]
+	push de
+	ld de, wLoadedMonDVs
+	call IsMonShiny
+	pop de
+	jr z, .setPal
+	ld hl, wShinyMonFlag
+	set 0, [hl]
+.setPal
+	ld c, d
+	ld b, SET_PAL_POKEMON_WHOLE_SCREEN
+	jp RunPaletteCommand
+; NUEVO PARA SHINY
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -2088,4 +2250,476 @@ INCLUDE "engine/evolution.asm"
 
 INCLUDE "engine/overworld/elevator.asm"
 
-INCLUDE "engine/items/tm_prices.asm"
+; NUEVO PARA GENERO
+SECTION "bank2A",ROMX,BANK[$2A]
+INCLUDE "engine/items/tm_prices.asm" ; MOVIDO DESDE EL BANK ANTERIOR PARA QUE QUEPA SKETCH ANIMATION
+INCLUDE "engine/mon_gender.asm"
+; NUEVO PARA GENERO
+; NUEVO PARA SHINY
+PlayShinySparkleAnimation:
+	; flash the screen
+	ld a, [rBGP]
+	push af ; save initial palette
+	ld a, %00011011 ; 0, 1, 2, 3 (inverted colors)
+	ld [rBGP], a
+	ld c, 4
+	call DelayFrames
+	pop af
+	ld [rBGP], a ; restore initial palette
+	; play animation
+	ld b, 11 + 1
+.loop
+	dec b
+	jr z, .animationFinished
+	ld c, ((ShinySparkleCoordsEnd - ShinySparkleCoords) / 3) + 1
+	ld a, [wShinyMonFlag]
+	bit 1, a
+	ld de, ShinySparkleCoords
+	jr z, .ok
+	ld de, EnemyShinySparkleCoords
+.ok
+	ld hl, wOAMBuffer
+.innerLoop
+	dec c
+	jr z, .delayFrames
+	ld a, [de]
+	cp b
+	jr c, .sparkleInactive
+	sub b
+	cp 4
+	jr nc, .sparkleInactive
+	push bc
+	ld b, a
+	inc de
+	ld a, [de]
+	ld [hli], a
+	inc de
+	ld a, [de]
+	ld [hli], a
+	inc de
+	ld a, $C9 ; first sparkle tile
+	add 3
+	sub b
+	ld [hli], a
+	xor a
+	ld [hli], a
+	pop bc
+	jr .innerLoop
+.sparkleInactive
+	inc de
+	inc de
+	inc de
+	xor a
+	ld [hli], a
+	ld [hli], a
+	ld [hli], a
+	ld [hli], a
+	jr .innerLoop
+.delayFrames
+	push bc
+	ld c,2
+	call DelayFrames
+	ld a, SFX_SILPH_SCOPE
+	call PlaySound
+	pop bc
+	jr .loop
+.animationFinished
+	xor a
+	ld hl, wOAMBuffer
+	ld bc, 4 * ((ShinySparkleCoordsEnd - ShinySparkleCoords) / 3)
+	jp FillMemory
+ShinySparkleCoords:
+; First byte is the frame where the animation starts (higher = sooner)
+; Second and third bytes are y/x coordinates
+	db $0B, 70, 48
+	db $0A, 75, 60
+	db $09, 86, 64
+	db $08, 99, 60
+	db $07, 103, 48
+	db $06, 99, 36
+	db $05, 86, 30
+	db $04, 75, 36
+ShinySparkleCoordsEnd:
+EnemyShinySparkleCoords:
+; First byte is the frame where the animation starts (higher = sooner)
+; Second and third bytes are y/x coordinates
+	db $0B, 70 - 48, 48 + 80
+	db $0A, 75 - 48, 60 + 80
+	db $09, 86 - 48, 64 + 80
+	db $08, 99 - 48, 60 + 80
+	db $07, 103 - 48, 48 + 80
+	db $06, 99 - 48, 36 + 80
+	db $05, 86 - 48, 30 + 80
+	db $04, 75 - 48, 36 + 80
+EnemyShinySparkleCoordsEnd:
+; NUEVO PARA SHINY
+
+SECTION "bank2C",ROMX,BANK[$2C]
+INCLUDE "scripts/move_relearner.asm"
+INCLUDE "scripts/move_deleter.asm"
+
+SECTION "bank2D",ROMX,BANK[$2D]
+INCLUDE "engine/battle/core.asm"
+
+; NUEVO PARA BATTLE EXP
+PrintEXPBar:
+	call CalcEXPBarPixelLength
+	ld a, [H_QUOTIENT + 3] ; pixel length
+	ld [wEXPBarPixelLength], a
+	ld b, a
+	ld c, $08
+	ld d, $08
+	coord hl, 17, 11
+.loop
+	ld a, b
+	sub c
+	jr nc, .skip
+	ld c, b
+	jr .loop
+.skip
+	ld b, a
+	ld a, $c0
+	add c
+.loop2
+	ld [hld], a
+	dec d
+	ret z
+	ld a, b
+	and a
+	jr nz, .loop
+	ld a, $c0
+	jr .loop2
+CalcEXPBarPixelLength:
+	ld hl, wEXPBarKeepFullFlag
+	bit 0, [hl]
+	jr z, .start
+	res 0, [hl]
+	ld a, $40
+	ld [H_QUOTIENT + 3], a
+	ret
+.start
+	; get the base exp needed for the current level
+	ld a, [wPlayerBattleStatus3]
+	ld hl, wBattleMonSpecies
+	bit 3, a
+	jr z, .skip
+	ld hl, wPartyMon1
+	call BattleMonPartyAttr
+.skip
+	ld a, [hl]
+	ld [wd0b5], a
+	call GetMonHeader
+	ld a, [wBattleMonLevel]
+	ld d, a
+	ld hl, CalcExperience
+	ld b, BANK(CalcExperience)
+	call Bankswitch
+	ld hl, H_MULTIPLICAND
+	ld de, wEXPBarBaseEXP
+	ld a, [hli]
+	ld [de], a
+	inc de
+	ld a, [hli]
+	ld [de], a
+	inc de
+	ld a, [hl]
+	ld [de], a
+	
+	; get the exp needed to gain a level
+	ld a, [wBattleMonLevel]
+	ld d, a
+	inc d
+	ld hl, CalcExperience
+	ld b, BANK(CalcExperience)
+	call Bankswitch
+	
+	; get the address of the active Pokemon's current experience
+	ld hl, wPartyMon1Exp
+	call BattleMonPartyAttr
+	
+	; current exp - base exp
+	ld b, h
+	ld c, l
+	ld hl, wEXPBarBaseEXP
+	ld de, wEXPBarCurEXP
+	call SubThreeByteNum
+	
+	; exp needed - base exp
+	ld bc, H_MULTIPLICAND
+	ld hl, wEXPBarBaseEXP
+	ld de, wEXPBarNeededEXP
+	call SubThreeByteNum
+	
+	; make the divisor an 8-bit number
+	ld hl, wEXPBarNeededEXP
+	ld de, wEXPBarCurEXP + 1
+	ld a, [hli]
+	and a
+	jr z, .twoBytes
+	ld a, [hli]
+	ld [hld], a
+	dec hl
+	ld a, [hli]
+	ld [hld], a
+	ld a, [de]
+	inc de
+	ld [de], a
+	dec de
+	dec de
+	ld a, [de]
+	inc de
+	ld [de], a
+	dec de
+	xor a
+	ld [hli], a
+	ld [de], a
+	inc de
+.twoBytes
+	ld a, [hl]
+	and a
+	jr z, .oneByte
+	srl a
+	ld [hli], a
+	ld a, [hl]
+	rr a
+	ld [hld], a
+	ld a, [de]
+	srl a
+	ld [de], a
+	inc de
+	ld a, [de]
+	rr a
+	ld [de], a
+	dec de
+	jr .twoBytes
+.oneByte
+	; current exp * (8 tiles * 8 pixels)
+	ld hl, H_MULTIPLICAND
+	ld de, wEXPBarCurEXP
+	ld a, [de]
+	inc de
+	ld [hli], a
+	ld a, [de]
+	inc de
+	ld [hli], a
+	ld a, [de]
+	ld [hl], a
+	ld a, $40
+	ld [H_MULTIPLIER], a
+	call Multiply
+	
+	; product / needed exp = pixel length
+	ld a, [wEXPBarNeededEXP + 2]
+	ld [H_DIVISOR], a
+	ld b, $04
+	jp Divide
+	
+; calculates the three byte number starting at [bc]
+; minus the three byte number starting at [hl]
+; and stores it into the three bytes starting at [de]
+; assumes that [hl] is smaller than [bc]
+SubThreeByteNum:
+	call .subByte
+	call .subByte
+.subByte
+	ld a, [bc]
+	inc bc
+	sub [hl]
+	inc hl
+	ld [de], a
+	jr nc, .noCarry
+	dec de
+	ld a, [de]
+	dec a
+	ld [de], a
+	inc de
+.noCarry
+	inc de
+	ret
+; return the address of the BattleMon's party struct attribute in hl
+BattleMonPartyAttr:
+	ld a, [wPlayerMonNumber]
+	ld bc, wPartyMon2 - wPartyMon1
+	jp AddNTimes
+; NUEVO PARA BATTLE EXP
+
+SECTION "Pics 6", ROMX, BANK[PICS_6]
+
+NosepassPicFront::  INCBIN "pic/bmon/nosepass.pic"
+NosepassPicBack::   INCBIN "pic/monback/nosepassb.pic"
+ProbopassPicFront:: INCBIN "pic/bmon/probopass.pic"
+ProbopassPicBack::  INCBIN "pic/monback/probopassb.pic"
+MimikyuPicFront::   INCBIN "pic/bmon/mimikyu.pic"
+MimikyuPicBack::    INCBIN "pic/monback/mimikyub.pic"
+TogepiPicFront::   INCBIN "pic/bmon/togepi.pic"
+TogepiPicBack::    INCBIN "pic/monback/togepib.pic"
+TogeticPicFront::   INCBIN "pic/bmon/togetic.pic"
+TogeticPicBack::    INCBIN "pic/monback/togeticb.pic"
+YamaskPicFront::   INCBIN "pic/bmon/yamask.pic"
+YamaskPicBack::    INCBIN "pic/monback/yamaskb.pic"
+CofagrigusPicFront::   INCBIN "pic/bmon/cofagrigus.pic"
+CofagrigusPicBack::    INCBIN "pic/monback/cofagrigusb.pic"
+FomantisPicFront::   INCBIN "pic/bmon/fomantis.pic"
+FomantisPicBack::    INCBIN "pic/monback/fomantisb.pic"
+LurantisPicFront::   INCBIN "pic/bmon/lurantis.pic"
+LurantisPicBack::    INCBIN "pic/monback/lurantisb.pic"
+RowletPicFront::   INCBIN "pic/bmon/rowlet.pic"
+RowletPicBack::    INCBIN "pic/monback/rowletb.pic"
+DartrixPicFront::   INCBIN "pic/bmon/dartrix.pic"
+DartrixPicBack::    INCBIN "pic/monback/dartrixb.pic"
+DecidueyePicFront::   INCBIN "pic/bmon/decidueye.pic"
+DecidueyePicBack::    INCBIN "pic/monback/decidueyeb.pic"
+LitwickPicFront::   INCBIN "pic/bmon/litwick.pic"
+LitwickPicBack::    INCBIN "pic/monback/litwickb.pic"
+LampentPicFront::   INCBIN "pic/bmon/lampent.pic"
+LampentPicBack::    INCBIN "pic/monback/lampentb.pic"
+ChandelurePicFront::   INCBIN "pic/bmon/chandelure.pic"
+ChandelurePicBack::    INCBIN "pic/monback/chandelureb.pic"
+MudkipPicFront::   INCBIN "pic/bmon/mudkip.pic"
+MudkipPicBack::    INCBIN "pic/monback/mudkipb.pic"
+MarshtompPicFront::   INCBIN "pic/bmon/marshtomp.pic"
+MarshtompPicBack::    INCBIN "pic/monback/marshtompb.pic"
+SwampertPicFront::   INCBIN "pic/bmon/swampert.pic"
+SwampertPicBack::    INCBIN "pic/monback/swampertb.pic"
+SwabluPicFront::   INCBIN "pic/bmon/swablu.pic"
+SwabluPicBack::    INCBIN "pic/monback/swablub.pic"
+AltariaPicFront::   INCBIN "pic/bmon/altaria.pic"
+AltariaPicBack::    INCBIN "pic/monback/altariab.pic"
+GrubbinPicFront::   INCBIN "pic/bmon/grubbin.pic"
+GrubbinPicBack::    INCBIN "pic/monback/grubbinb.pic"
+CharjabugPicFront::   INCBIN "pic/bmon/charjabug.pic"
+CharjabugPicBack::    INCBIN "pic/monback/charjabugb.pic"
+VikavoltPicFront::   INCBIN "pic/bmon/vikavolt.pic"
+VikavoltPicBack::    INCBIN "pic/monback/vikavoltb.pic"
+SneaselPicFront::   INCBIN "pic/bmon/sneasel.pic"
+SneaselPicBack::    INCBIN "pic/monback/sneaselb.pic"
+SmearglePicFront::   INCBIN "pic/bmon/smeargle.pic"
+SmearglePicBack::    INCBIN "pic/monback/smeargleb.pic"
+
+SECTION "Pics 7", ROMX, BANK[PICS_7]
+MicomonPicFront::   INCBIN "pic/bmon/micomon.pic"
+MicomonPicBack::    INCBIN "pic/monback/micomonb.pic"
+CrobatPicFront::   INCBIN "pic/bmon/crobat.pic"
+CrobatPicBack::    INCBIN "pic/monback/crobatb.pic"
+ScizorPicFront::   INCBIN "pic/bmon/scizor.pic"
+ScizorPicBack::    INCBIN "pic/monback/scizorb.pic"
+TrapinchPicFront::   INCBIN "pic/bmon/trapinch.pic"
+TrapinchPicBack::    INCBIN "pic/monback/trapinchb.pic"
+VibravaPicFront::   INCBIN "pic/bmon/vibrava.pic"
+VibravaPicBack::    INCBIN "pic/monback/vibravab.pic"
+FlygonPicFront::   INCBIN "pic/bmon/flygon.pic"
+FlygonPicBack::    INCBIN "pic/monback/flygonb.pic"
+SandilePicFront::   INCBIN "pic/bmon/sandile.pic"
+SandilePicBack::    INCBIN "pic/monback/sandileb.pic"
+KrokorokPicFront::   INCBIN "pic/bmon/krokorok.pic"
+KrokorokPicBack::    INCBIN "pic/monback/krokorokb.pic"
+KrookodilePicFront::   INCBIN "pic/bmon/krookodile.pic"
+KrookodilePicBack::    INCBIN "pic/monback/krookodileb.pic"
+SolosisPicFront::   INCBIN "pic/bmon/solosis.pic"
+SolosisPicBack::    INCBIN "pic/monback/solosisb.pic"
+DuosionPicFront::   INCBIN "pic/bmon/duosion.pic"
+DuosionPicBack::    INCBIN "pic/monback/duosionb.pic"
+ReuniclusPicFront::   INCBIN "pic/bmon/reuniclus.pic"
+ReuniclusPicBack::    INCBIN "pic/monback/reuniclusb.pic"
+CatermanoPicFront::   INCBIN "pic/bmon/catermano.pic"
+CatermanoPicBack::    INCBIN "pic/monback/catermanob.pic"
+LucarioPicFront::   INCBIN "pic/bmon/lucario.pic"
+LucarioPicBack::    INCBIN "pic/monback/lucariob.pic"
+TimburrPicFront::   INCBIN "pic/bmon/timburr.pic"
+TimburrPicBack::    INCBIN "pic/monback/timburrb.pic"
+GurdurrPicFront::   INCBIN "pic/bmon/gurdurr.pic"
+GurdurrPicBack::    INCBIN "pic/monback/gurdurrb.pic"
+ConkeldurrPicFront::   INCBIN "pic/bmon/conkeldurr.pic"
+ConkeldurrPicBack::    INCBIN "pic/monback/conkeldurrb.pic"
+TyranitarPicFront::   INCBIN "pic/bmon/tyranitar.pic"
+TyranitarPicBack::    INCBIN "pic/monback/tyranitarb.pic"
+SteelixPicFront::   INCBIN "pic/bmon/steelix.pic"
+SteelixPicBack::    INCBIN "pic/monback/steelixb.pic"
+BeldumPicFront::   INCBIN "pic/bmon/beldum.pic"
+BeldumPicBack::    INCBIN "pic/monback/beldumb.pic"
+MetangPicFront::   INCBIN "pic/bmon/metang.pic"
+MetangPicBack::    INCBIN "pic/monback/metangb.pic"
+MetagrossPicFront::   INCBIN "pic/bmon/metagross.pic"
+MetagrossPicBack::    INCBIN "pic/monback/metagrossb.pic"
+Dark_PikaPicFront::   INCBIN "pic/bmon/darkpika.pic"
+Dark_PikaPicBack::    INCBIN "pic/monback/darkpikab.pic"
+ZoroarkPicFront::   INCBIN "pic/bmon/zoroark.pic"
+ZoroarkPicBack::    INCBIN "pic/monback/zoroarkb.pic"
+DrampaPicFront::   INCBIN "pic/bmon/drampa.pic"
+DrampaPicBack::    INCBIN "pic/monback/drampab.pic"
+WeavilePicFront::   INCBIN "pic/bmon/weavile.pic"
+WeavilePicBack::    INCBIN "pic/monback/weavileb.pic"
+DrillburPicFront::   INCBIN "pic/bmon/drillbur.pic"
+DrillburPicBack::    INCBIN "pic/monback/drillburb.pic"
+ExcadrillPicFront::   INCBIN "pic/bmon/excadrill.pic"
+ExcadrillPicBack::    INCBIN "pic/monback/excadrillb.pic"
+TynamoPicFront::   INCBIN "pic/bmon/tynamo.pic"
+TynamoPicBack::    INCBIN "pic/monback/tynamob.pic"
+
+SECTION "Pics 8", ROMX, BANK[PICS_8]
+EelektrikPicFront::   INCBIN "pic/bmon/eelektrik.pic"
+EelektrikPicBack::    INCBIN "pic/monback/eelektrikb.pic"
+EelektrossPicFront::   INCBIN "pic/bmon/eelektross.pic"
+EelektrossPicBack::    INCBIN "pic/monback/eelektrossb.pic"
+SnoverPicFront::   INCBIN "pic/bmon/snover.pic"
+SnoverPicBack::    INCBIN "pic/monback/snoverb.pic"
+AbomasnowPicFront::   INCBIN "pic/bmon/abomasnow.pic"
+AbomasnowPicBack::    INCBIN "pic/monback/abomasnowb.pic"
+TogekissPicFront::   INCBIN "pic/bmon/togekiss.pic"
+TogekissPicBack::    INCBIN "pic/monback/togekissb.pic"
+HeracrossPicFront::   INCBIN "pic/bmon/heracross.pic"
+HeracrossPicBack::    INCBIN "pic/monback/heracrossb.pic"
+EspeonPicFront::   INCBIN "pic/bmon/espeon.pic"
+EspeonPicBack::    INCBIN "pic/monback/espeonb.pic"
+UmbreonPicFront::   INCBIN "pic/bmon/umbreon.pic"
+UmbreonPicBack::    INCBIN "pic/monback/umbreonb.pic"
+LeafeonPicFront::   INCBIN "pic/bmon/leafeon.pic"
+LeafeonPicBack::    INCBIN "pic/monback/leafeonb.pic"
+GlaceonPicFront::   INCBIN "pic/bmon/glaceon.pic"
+GlaceonPicBack::    INCBIN "pic/monback/glaceonb.pic"
+HoundourPicFront::   INCBIN "pic/bmon/houndour.pic"
+HoundourPicBack::    INCBIN "pic/monback/houndourb.pic"
+HoundoomPicFront::   INCBIN "pic/bmon/houndoom.pic"
+HoundoomPicBack::    INCBIN "pic/monback/houndoomb.pic"
+ChinchouPicFront::   INCBIN "pic/bmon/chinchou.pic"
+ChinchouPicBack::    INCBIN "pic/monback/chinchoub.pic"
+LanturnPicFront::   INCBIN "pic/bmon/lanturn.pic"
+LanturnPicBack::    INCBIN "pic/monback/lanturnb.pic"
+MurkrowPicFront::   INCBIN "pic/bmon/murkrow.pic"
+MurkrowPicBack::    INCBIN "pic/monback/murkrowb.pic"
+HonchkrowPicFront::   INCBIN "pic/bmon/honchkrow.pic"
+HonchkrowPicBack::    INCBIN "pic/monback/honchkrowb.pic"
+HydreigonPicFront::   INCBIN "pic/bmon/hydreigon.pic"
+HydreigonPicBack::    INCBIN "pic/monback/hydreigonb.pic"
+CarvanhaPicFront::   INCBIN "pic/bmon/carvanha.pic"
+CarvanhaPicBack::    INCBIN "pic/monback/carvanhab.pic"
+SharpedoPicFront::   INCBIN "pic/bmon/sharpedo.pic"
+SharpedoPicBack::    INCBIN "pic/monback/sharpedob.pic"
+NumelPicFront::   INCBIN "pic/bmon/numel.pic"
+NumelPicBack::    INCBIN "pic/monback/numelb.pic"
+CameruptPicFront::   INCBIN "pic/bmon/camerupt.pic"
+CameruptPicBack::    INCBIN "pic/monback/cameruptb.pic"
+RhyperiorPicFront::   INCBIN "pic/bmon/rhyperior.pic"
+RhyperiorPicBack::    INCBIN "pic/monback/rhyperiorb.pic"
+KingdraPicFront::   INCBIN "pic/bmon/kingdra.pic"
+KingdraPicBack::    INCBIN "pic/monback/kingdrab.pic"
+SkarmoryPicFront::   INCBIN "pic/bmon/skarmory.pic"
+SkarmoryPicBack::    INCBIN "pic/monback/skarmoryb.pic"
+SalamencePicFront::   INCBIN "pic/bmon/salamence.pic"
+SalamencePicBack::    INCBIN "pic/monback/salamenceb.pic"
+MagnezonePicFront::   INCBIN "pic/bmon/magnezone.pic"
+MagnezonePicBack::    INCBIN "pic/monback/magnezoneb.pic"
+TangrowthPicFront::   INCBIN "pic/bmon/tangrowth.pic"
+TangrowthPicBack::    INCBIN "pic/monback/tangrowthb.pic"
+ElectivirePicFront::   INCBIN "pic/bmon/electivire.pic"
+ElectivirePicBack::    INCBIN "pic/monback/electivireb.pic"
+MagmortarPicFront::   INCBIN "pic/bmon/magmortar.pic"
+MagmortarPicBack::    INCBIN "pic/monback/magmortarb.pic"
+
+SECTION "Pics 9", ROMX, BANK[PICS_9]
+LickilickyPicFront::   INCBIN "pic/bmon/lickilicky.pic"
+LickilickyPicBack::    INCBIN "pic/monback/lickilickyb.pic"
+Porygon2PicFront::   INCBIN "pic/bmon/porygon2.pic"
+Porygon2PicBack::    INCBIN "pic/monback/porygon2b.pic"
+PorygonzPicFront::   INCBIN "pic/bmon/porygonz.pic"
+PorygonzPicBack::    INCBIN "pic/monback/porygonzb.pic"

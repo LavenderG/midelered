@@ -1,7 +1,7 @@
 db DEX_PIKACHU ; pokedex id
 db 35 ; base hp
 db 55 ; base attack
-db 30 ; base defense
+db 40 ; base defense
 db 90 ; base speed
 db 50 ; base special
 db ELECTRIC ; species type 1
@@ -24,5 +24,5 @@ db 0 ; growth rate
 	tmlearn 25,31,32
 	tmlearn 33,34,39,40
 	tmlearn 44,45
-	tmlearn 50,55
-db 0 ; padding
+	tmlearn 50,52,53,55
+db BANK(PikachuPicFront)

@@ -30,13 +30,41 @@ SetPal_Battle:
 	ld de, wPalPacket
 	ld bc, $10
 	call CopyData
+	; NUEVO PARA SHINY
+	ld hl, wShinyMonFlag
+	res 0, [hl]
+	ld a, [wBattleMonSpecies]
+	and a
+	jr z, .getPalID
+	ld de, wBattleMonDVs
+	callba IsMonShiny
+	jr z, .getPalID
+	ld hl, wShinyMonFlag
+	set 0, [hl]
+.getPalID
+; NUEVO PARA SHINY
 	ld a, [wPlayerBattleStatus3]
 	ld hl, wBattleMonSpecies
 	call DeterminePaletteID
 	ld b, a
+	; NUEVO PARA SHINY
+	push bc
+	ld hl, wShinyMonFlag
+	res 0, [hl]
+	ld a, [wEnemyMonSpecies2]
+	and a
+	jr z, .getPalID2
+	ld de, wEnemyMonDVs
+	callba IsMonShiny
+	jr z, .getPalID2
+	ld hl, wShinyMonFlag
+	set 0, [hl]
+.getPalID2
+; NUEVO PARA SHINY
 	ld a, [wEnemyBattleStatus3]
 	ld hl, wEnemyMonSpecies2
 	call DeterminePaletteID
+	pop bc ; NUEVO PARA SHINY 
 	ld c, a
 	ld hl, wPalPacket + 1
 	ld a, [wPlayerHPBarColor]
@@ -70,7 +98,7 @@ SetPal_StatusScreen:
 	ld bc, $10
 	call CopyData
 	ld a, [wcf91]
-	cp VICTREEBEL + 1
+	cp PORYGONZ + 1  ;  NUEVO CAMBIADO PARA SPRITES HASTA DARK PIKA
 	jr c, .pokemon
 	ld a, $1 ; not pokemon
 .pokemon
@@ -286,7 +314,28 @@ DeterminePaletteIDOutOfBattle:
 	ld d, 0
 	ld hl, MonsterPalettes ; not just for Pokemon, Trainers use it too
 	add hl, de
+	; NUEVO PARA SHINY
+	ld [wd11e], a
+	and a ; is the mon index 0?
+	; NUEVO PARA SHINY
 	ld a, [hl]
+	; NUEVO PARA SHINY
+	ret z
+	push bc
+	ld d, a
+	ld a, e
+	and a
+	ld a, d
+	jr z, .done
+	ld b, a
+	ld a, [wShinyMonFlag]
+	bit 0, a
+	ld a, b
+	jr z, .done
+	add PAL_SHINYMEWMON - PAL_MEWMON
+.done
+	pop bc
+	; NUEVO PARA SHINY
 	ret
 
 InitPartyMenuBlkPacket:

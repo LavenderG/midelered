@@ -10,7 +10,12 @@ TryDoWildEncounter:
 	callab IsPlayerStandingOnDoorTileOrWarpTile
 	jr nc, .notStandingOnDoorOrWarpTile
 .CantEncounter
-	ld a, $1
+; NUEVO PARA SHINY
+	;ld a, $1
+	xor a
+	ld [wNextEncounterSpecies], a
+	inc a
+	; NUEVO PARA SHINY
 	and a
 	ret
 .notStandingOnDoorOrWarpTile
@@ -48,6 +53,12 @@ TryDoWildEncounter:
 .CanEncounter
 ; compare encounter chance with a random number to determine if there will be an encounter
 	ld b, a
+	; NUEVO PARA SHINY
+	ld a, [wNextEncounterSpecies]
+	and a
+	jr nz, .WillEncounterIfNotRepelled
+; compare encounter chance with a random number to determine if there will be an encounter
+; NUEVO PARA SHINY
 	ld a, [hRandomAdd]
 	cp b
 	jr nc, .CantEncounter2
@@ -74,19 +85,34 @@ TryDoWildEncounter:
 	ld b, 0
 	add hl, bc
 	ld a, [hli]
-	ld [wCurEnemyLVL], a
+	; NUEVO PARA SHINY
+	;ld [wCurEnemyLVL], a
+	ld [wNextEncounterLevel], a
+	; NUEVO PARA SHINY
 	ld a, [hl]
-	ld [wcf91], a
-	ld [wEnemyMonSpecies2], a
+	; NUEVO PARA SHINY
+	;ld [wcf91], a
+	;ld [wEnemyMonSpecies2], a
+	ld [wNextEncounterSpecies], a
+	; NUEVO PARA SHINY
 	ld a, [wRepelRemainingSteps]
 	and a
-	jr z, .willEncounter
+	; NUEVO PARA SHINY
+	;jr z, .willEncounter
+	jr z, .willEncounterNext
+	; NUEVO PARA SHINY
 	ld a, [wPartyMon1Level]
 	ld b, a
-	ld a, [wCurEnemyLVL]
+	; NUEVO PARA SHINY
+	;ld a, [wCurEnemyLVL]
+	ld a, [wNextEncounterLevel]
+	; NUEVO PARA SHINY
 	cp b
 	jr c, .CantEncounter2 ; repel prevents encounters if the leading party mon's level is higher than the wild mon
-	jr .willEncounter
+	; NUEVO PARA SHINY
+	;jr .willEncounter
+	jr .willEncounterNext
+	; NUEVO PARA SHINY
 .lastRepelStep
 	ld [wRepelRemainingSteps], a
 	ld a, TEXT_REPEL_WORE_OFF
@@ -94,10 +120,33 @@ TryDoWildEncounter:
 	call EnableAutoTextBoxDrawing
 	call DisplayTextID
 .CantEncounter2
+; NUEVO PARA SHINY
+xor a
+	ld [wNextEncounterSpecies], a
+.willEncounterNext
+; NUEVO PARA SHINY
 	ld a, $1
 	and a
 	ret
+	; NUEVO PARA SHINY
+.WillEncounterIfNotRepelled
+	ld a, [wRepelRemainingSteps]
+	and a
+	jr z, .willEncounter
+	ld a, [wPartyMon1Level]
+	ld b, a
+	ld a, [wNextEncounterLevel]
+	cp b
+	jr c, .CantEncounter2 ; repel prevents encounters if the leading party mon's level is higher than the wild mon
+	; NUEVO PARA SHINY
 .willEncounter
+; NUEVO PARA SHINY
+ld a, [wNextEncounterLevel]
+	ld [wCurEnemyLVL], a
+	ld a, [wNextEncounterSpecies]
+	ld [wcf91], a
+	ld [wEnemyMonSpecies2], a
+	; NUEVO PARA SHINY
 	xor a
 	ret
 

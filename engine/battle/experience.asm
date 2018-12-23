@@ -21,7 +21,7 @@ GainExperience:
 	and a ; is mon's gain exp flag set?
 	pop hl
 	jp z, .nextMon ; if mon's gain exp flag not set, go to next mon
-
+	; NUEVO PARA LEVEL CAP
 	; badge level cap
 	call GetBadgeLevel
 	push hl
@@ -36,6 +36,7 @@ GainExperience:
 	; if level is >= level cap, done
 	jp nc, .done
 .gain_stat_exp
+; NUEVO PARA LEVEL CAP
 	ld de, (wPartyMon1HPExp + 1) - (wPartyMon1HP + 1)
 	add hl, de
 	ld d, h
@@ -165,6 +166,7 @@ GainExperience:
 	call PrintText
 	xor a ; PLAYER_PARTY_DATA
 	ld [wMonDataLocation], a
+	call AnimateEXPBar ; NUEVO PARA BATTLE EXP
 	call LoadMonData
 	pop hl
 	ld bc, wPartyMon1Level - wPartyMon1Exp
@@ -173,8 +175,10 @@ GainExperience:
 	callba CalcLevelFromExperience
 	pop hl
 	ld a, [hl] ; current level
+	ld [wTempLevel], a ; store current level   ; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
 	cp d
 	jp z, .nextMon ; if level didn't change, go to next mon
+	call KeepEXPBarFull ; NUEVO PARA BATTLE EXP
 	ld a, [wCurEnemyLVL]
 	push af
 	push hl
@@ -259,6 +263,7 @@ GainExperience:
 	call PrintText
 	xor a ; PLAYER_PARTY_DATA
 	ld [wMonDataLocation], a
+	call AnimateEXPBarAgain ; NUEVO PARA BATTLE EXP
 	call LoadMonData
 	ld d, $1
 	callab PrintStatsBox
@@ -268,7 +273,27 @@ GainExperience:
 	ld [wMonDataLocation], a
 	ld a, [wd0b5]
 	ld [wd11e], a
+
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+	ld a, [wCurEnemyLVL]
+	ld c, a
+	ld a, [wTempLevel]
+	ld b, a
+.level_loop
+	inc b
+	ld a, b
+	ld [wCurEnemyLVL], a
+	push bc
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+
 	predef LearnMoveFromLevelUp
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+	pop bc
+	ld a, b
+	cp c
+	jr nz, .level_loop
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+
 	ld hl, wCanEvolveFlags
 	ld a, [wWhichPokemon]
 	ld c, a

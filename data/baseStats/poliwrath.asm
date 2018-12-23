@@ -1,6 +1,6 @@
 db DEX_POLIWRATH ; pokedex id
 db 90 ; base hp
-db 85 ; base attack
+db 95 ; base attack
 db 95 ; base defense
 db 70 ; base speed
 db 70 ; base special
@@ -23,6 +23,6 @@ db 3 ; growth rate
 	tmlearn 17,18,19,20
 	tmlearn 26,27,29,31,32
 	tmlearn 34,35,40
-	tmlearn 44,46
+	tmlearn 44,46,48
 	tmlearn 50,53,54
-db 0 ; padding
+db BANK(PoliwrathPicFront)

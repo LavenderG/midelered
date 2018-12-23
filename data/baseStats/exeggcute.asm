@@ -18,11 +18,11 @@ db 0
 db 0
 db 5 ; growth rate
 ; learnset
-	tmlearn 6
+	tmlearn 3,6
 	tmlearn 9,10
-	tmlearn 20
+	tmlearn 20,22
 	tmlearn 29,30,31,32
 	tmlearn 33,34,36,37
 	tmlearn 44,46,47
 	tmlearn 50
-db 0 ; padding
+db BANK(ExeggcutePicFront)

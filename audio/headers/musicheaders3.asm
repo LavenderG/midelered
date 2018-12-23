@@ -54,3 +54,4 @@ Music_MeetFemaleTrainer::
 
 Music_MeetMaleTrainer::
 	audio Music_MeetMaleTrainer, Ch0, Ch1, Ch2
+

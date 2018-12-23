@@ -6,7 +6,6 @@ IsMicoloName:
   push hl
   ld de, wPlayerName
   ld hl, .MicoloName
-
 .name_check_loop
   ld a, [de]
   ld b, [hl]
@@ -29,5 +28,4 @@ IsMicoloName:
   pop de
   pop bc
   ret
-
 .MicoloName: db "MICOLO@"

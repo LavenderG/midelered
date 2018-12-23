@@ -117,3 +117,4 @@ _MtMoon1Text14::
 	text "Beware! ZUBAT is"
 	line "a blood sucker!"
 	done
+

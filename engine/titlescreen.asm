@@ -118,13 +118,17 @@ DisplayTitleScreen:
 	call LoadScreenTilesFromBuffer2
 	call EnableLCD
 IF DEF(_RED)
-	ld a, CHARMANDER ; which Pokemon to show first on the title screen
+;	ld a, CHARMANDER ; which Pokemon to show first on the title screen
+	ld b, CHARMANDER ; which Pokemon to show first on the title screen
 ENDC
 IF DEF(_BLUE)
-	ld a, SQUIRTLE ; which Pokemon to show first on the title screen
+;	ld a, SQUIRTLE ; which Pokemon to show first on the title screen
+	ld b, SQUIRTLE ; which Pokemon to show first on the title screen
 ENDC
-
+    ld a, c ; NUEVO
 	ld [wTitleMonSpecies], a
+	ld a, b ; NUEVO
+	ld [wTitleMonSpecies + 1], a ;NUEVO
 	call LoadTitleMonSprite
 	ld a, (vBGMap0 + $300) / $100
 	call TitleScreenCopyTileMapToVRAM
@@ -232,6 +236,11 @@ ENDC
 
 .finishedWaiting
 	ld a, [wTitleMonSpecies]
+	; NUEVO
+	ld e, a
+	ld a, [wTitleMonSpecies + 1]
+	ld d, a
+	; NUEVO
 	call PlayCry
 	call WaitForSoundToFinish
 	call GBPalWhiteOutWithDelay3
@@ -265,17 +274,29 @@ TitleScreenPickNewMon:
 ; Keep looping until a mon different from the current one is picked.
 	call Random
 	and $f
+	add a, a ; NUEVO
 	ld c, a
 	ld b, 0
 	ld hl, TitleMons
 	add hl, bc
+	ld a, [hli] ; NUEVO
+	ld c, a ; NUEVO
 	ld a, [hl]
+	ld b, a ; NUEVO
 	ld hl, wTitleMonSpecies
 
 ; Can't be the same as before.
+; NUEVO
+ld a, c
+	cp [hl]
+	jr nz, .different
+	ld a, b
+	inc hl
+	; NUEVO
 	cp [hl]
 	jr z, .loop
 
+.different
 	ld [hl], a
 	call LoadTitleMonSprite
 
@@ -351,8 +372,15 @@ ClearBothBGMaps:
 	jp FillMemory
 
 LoadTitleMonSprite:
+; bc = mon id ; NUEVO
+	ld a, c ; NUEVO
 	ld [wcf91], a
 	ld [wd0b5], a
+	; NUEVO
+	ld a, b
+	ld [wcf91 + 1], a
+	ld [wd0b5 + 1], a
+	; NUEVO
 	coord hl, 5, 10
 	call GetMonHeader
 	jp LoadFrontSpriteByMonIndex

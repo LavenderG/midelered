@@ -99,7 +99,7 @@ StartMenu_Pokemon:
 	ld [wMonDataLocation], a
 	predef StatusScreen
 	predef StatusScreen2
-	predef StatusScreen3
+	predef StatusScreen3 ; NUEVO TERCERA PANTALLA DE STATS
 	call ReloadMapData
 	jp StartMenu_Pokemon
 .choseOutOfBattleMove

@@ -13,7 +13,7 @@ dw ChanseyPicFront
 dw ChanseyPicBack
 ; attacks known at lvl 0
 db POUND
-db DOUBLESLAP
+db TAIL_WHIP
 db 0
 db 0
 db 4 ; growth rate
@@ -25,4 +25,4 @@ db 4 ; growth rate
 	tmlearn 33,34,35,37,38,40
 	tmlearn 41,44,45,46
 	tmlearn 49,50,54,55
-db 0 ; padding
+db BANK(ChanseyPicFront)

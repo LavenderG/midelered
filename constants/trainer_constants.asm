@@ -53,3 +53,10 @@ const_value = 1
 	trainer_const CHANNELER     ; $2D
 	trainer_const AGATHA        ; $2E
 	trainer_const LANCE         ; $2F
+	trainer_const RAGU       ; $30 	; NUEVO AÑADIENDO UN ENTRENADOR
+	trainer_const GOLDY       ; $31 	; NUEVO AÑADIENDO UN ENTRENADOR
+	trainer_const UTALAWEA       ; $32	; NUEVO AÑADIENDO UN ENTRENADOR
+	trainer_const EEVEETO       ; $32	; NUEVO AÑADIENDO UN ENTRENADOR
+	trainer_const JAVISIT       ; $32	; NUEVO AÑADIENDO UN ENTRENADOR
+	trainer_const MANEC     ; $32	; NUEVO AÑADIENDO UN ENTRENADOR
+	trainer_const DARKI     ; $32	; NUEVO AÑADIENDO UN ENTRENADOR

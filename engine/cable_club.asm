@@ -624,7 +624,7 @@ TradeCenter_DisplayStats:
 	ld [wWhichPokemon], a
 	predef StatusScreen
 	predef StatusScreen2
-	predef StatusScreen3
+	predef StatusScreen3 ; NUEVO TERCERA PANTALLA DE STATS
 	call GBPalNormal
 	call LoadTrainerInfoTextBoxTiles
 	call TradeCenter_DrawPartyLists

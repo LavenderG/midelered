@@ -27,39 +27,39 @@ _OaksLabText39::
 
 _OaksLabCharmanderText::
 	text "So! You want the"
-	line "fire #MON,"
-	cont "CHARMANDER?"
+	line "dark #MON,"
+	cont "SANDILE?"
 	done
 
 _OaksLabSquirtleText::
 	text "So! You want the"
-	line "water #MON,"
-	cont "SQUIRTLE?"
+	line "fighting #MON,"
+	cont "TIMBURR?"
 	done
 
 _OaksLabBulbasaurText::
 	text "So! You want the"
-	line "plant #MON,"
-	cont "BULBASAUR?"
+	line "psychic #MON,"
+	cont "BELDUM?"
 	done
 
+; NUEVO PARA MICOLO PROTA
 _OaksLabMicoloStarter1Text::
 	text "So! You want the"
 	line "fire #MON,"
-	cont "MOLTRES?"
+	cont "CATERMANO?"
 	done
-
 _OaksLabMicoloStarter2Text::
 	text "So! You want the"
 	line "ice #MON,"
-	cont "ARTICUNO?"
+	cont "DARK PIKA?"
 	done
-
 _OaksLabMicoloStarter3Text::
 	text "So! You want the"
 	line "electric #MON,"
-	cont "ZAPDOS?"
+	cont "MICOMON?"
 	done
+; NUEVO PARA MICOLO PROTA
 
 _OaksLabMonEnergeticText::
 	text "This #MON is"
@@ -131,7 +131,7 @@ _OaksLabAroundWorldText::
 	done
 
 _OaksLabGivePokeballsText1::
-	text "OAK: You can't get"
+	text "You can't get"
 	line "detailed data on"
 	cont "#MON by just"
 	cont "seeing them."
@@ -151,8 +151,8 @@ _OaksLabGivePokeballsText2::
 	cont "it's fair game."
 
 	para "Just throw a #"
-	line "BALL at it and try"
-	line "to catch it!"
+	line "BALL at it and"
+	cont "try to catch it!"
 
 	para "This won't always"
 	line "work, though."

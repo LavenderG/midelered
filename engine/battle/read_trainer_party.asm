@@ -51,8 +51,10 @@ ReadTrainer:
 	jr z, .SpecialTrainer ; if so, check for special moves
 	cp TRAINERTYPE_CUSTOM ; is the trainer custom?
 	jp z, .CustomTrainer
+	; NUEVO PARA NIVELES DINAMICOS DE ENTRENADOR
 	cp TRAINERTYPE_DYNAMIC
 	jp z, .DynamicTrainer
+	; NUEVO PARA NIVELES DINAMICOS DE ENTRENADOR
 	; else, assumed to be TRAINERTYPE_POKERED_NORMAL
 	ld [wCurEnemyLVL], a
 .LoopTrainerData
@@ -225,6 +227,7 @@ ReadTrainer:
 .party_end
 	jr .FinishUp
 
+; NUEVO PARA NIVELES DINAMICOS DE ENTRENADO
 .DynamicTrainer
 	; get level and store it in c
 	ld a, [hli] ; *_LEVEL value
@@ -238,19 +241,16 @@ ReadTrainer:
 	; byte 0: party terminator
 	cp 0
 	jr z, .dynamic_party_end
-
 	ld [wcf91], a ; fist byte is species
 	; set level value
 	ld a, c
 	ld [wCurEnemyLVL], a
-
 	; Add mon to party
 	ld a, ENEMY_PARTY_DATA
 	ld [wMonDataLocation], a
 	push hl
 	call AddPartyMon
 	pop hl
-
 	; set wEnemyMonxMoves at de, with x = b + 1
 	push bc
 	push hl
@@ -262,7 +262,6 @@ ReadTrainer:
 	ld e, l
 	pop hl
 	pop bc
-
 	; set moves after adding mon to party
 	ld a, [hli]
 	call ConvertToValidMove
@@ -279,12 +278,12 @@ ReadTrainer:
 	ld a, [hli]
 	call ConvertToValidMove
 	ld [de], a ; fifth byte is fourth move
-
 	; increment party mon counter
 	inc b
 	jr .dynamic_party_loop
 .dynamic_party_end
 	jp .FinishUp
+; NUEVO PARA NIVELES DINAMICOS DE ENTRENADO
 
 ; converts a to a valid move
 ; fix used to use 0 as a valid move without breaking ReadTrainer routine

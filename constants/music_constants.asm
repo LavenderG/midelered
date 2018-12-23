@@ -94,6 +94,9 @@ ENDM
 	music_const MUSIC_MEET_FEMALE_TRAINER, Music_MeetFemaleTrainer
 	music_const MUSIC_MEET_MALE_TRAINER,   Music_MeetMaleTrainer
 
+	; AUDIO_4
+	music_const MUSIC_HEARTMULHOLLAND,     Music_HeartMulholland
+
 	; AUDIO_1 AUDIO_2 AUDIO_3
 	music_const SFX_SNARE_1,            SFX_Snare1_1
 	music_const SFX_SNARE_2,            SFX_Snare2_1

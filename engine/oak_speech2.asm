@@ -191,7 +191,7 @@ IF DEF(_RED)
 DefaultNamesPlayer:
 	db   "NEW NAME"
 	next "RED"
-	next "ASH"
+	next "MICOLO"
 	next "JACK"
 	db   "@"
 
@@ -207,7 +207,7 @@ IF DEF(_BLUE)
 DefaultNamesPlayer:
 	db   "NEW NAME"
 	next "BLUE"
-	next "GARY"
+	next "MICOLO"
 	next "JOHN"
 	db   "@"
 
@@ -247,7 +247,7 @@ IF DEF(_RED)
 DefaultNamesPlayerList:
 	db "NEW NAME@"
 	db "RED@"
-	db "ASH@"
+	db "MICOLO@"
 	db "JACK@"
 DefaultNamesRivalList:
 	db "NEW NAME@"
@@ -259,7 +259,7 @@ IF DEF(_BLUE)
 DefaultNamesPlayerList:
 	db "NEW NAME@"
 	db "BLUE@"
-	db "GARY@"
+	db "MICOLO@"
 	db "JOHN@"
 DefaultNamesRivalList:
 	db "NEW NAME@"

@@ -191,7 +191,8 @@ OaksLabScript7:
 	ret
 
 OaksLabScript8:
-	call IsMicoloName
+; NUEVO PARA MICOLO
+    call IsMicoloName
 	jr c, .compare_micolo
 	ld a, [wPlayerStarter]
 	cp STARTER1
@@ -200,10 +201,11 @@ OaksLabScript8:
 	jr z, .Squirtle
 	jr .Bulbasaur
 .compare_micolo
+; NUEVO PARA MICOLO
 	ld a, [wPlayerStarter]
-	cp STARTER1_MICOLO
+	cp STARTER1_MICOLO ;NUEVO PARA MICOLO cp STARTER1  
 	jr z, .Charmander
-	cp STARTER2_MICOLO
+	cp STARTER2_MICOLO ;NUEVO PARA MICOLO cp STARTER2
 	jr z, .Squirtle
 	jr .Bulbasaur
 .Charmander
@@ -807,15 +809,19 @@ OaksLabText2:
 	ld [wRivalStarterTemp], a
 	ld a, $3
 	ld [wRivalStarterBallSpriteIndex], a
+	; NUEVO PARA MICOLO PROTA
 	call IsMicoloName
 	jr c, .is_micolo
+	; NUEVO PARA MICOLO PROTA
 	ld a, STARTER1
 	ld b, $2
 	jr OaksLabScript_1d133
+	; NUEVO PARA MICOLO PROTA
 .is_micolo
 	ld a, STARTER1_MICOLO
 	ld b, $2
 	jr OaksLabScript_1d133
+	;NUEVO PARA MICOLO PROTA
 
 OaksLabText3:
 	TX_ASM
@@ -823,15 +829,19 @@ OaksLabText3:
 	ld [wRivalStarterTemp], a
 	ld a, $4
 	ld [wRivalStarterBallSpriteIndex], a
+	; NUEVO PARA MICOLO PROTA
 	call IsMicoloName
 	jr c, .is_micolo
+	; NUEVO PARA MICOLO PROTA
 	ld a, STARTER2
 	ld b, $3
 	jr OaksLabScript_1d133
+	; NUEVO PARA MICOLO PROTA
 .is_micolo
 	ld a, STARTER2_MICOLO
 	ld b, $3
 	jr OaksLabScript_1d133
+	; NUEVO PARA MICOLO PROTA
 
 OaksLabText4:
 	TX_ASM
@@ -839,14 +849,18 @@ OaksLabText4:
 	ld [wRivalStarterTemp], a
 	ld a, $2
 	ld [wRivalStarterBallSpriteIndex], a
+	; NUEVO PARA MICOLO PROTA
 	call IsMicoloName
 	jr c, .is_micolo
+	; NUEVO PARA MICOLO PROTA
 	ld a, STARTER3
 	ld b, $4
+	; NUEVO PARA MICOLO PROTA
 	jr OaksLabScript_1d133
 .is_micolo
 	ld a, STARTER3_MICOLO
 	ld b, $4
+	; NUEVO PARA MICOLO PROTA
 
 OaksLabScript_1d133:
 	ld [wcf91], a
@@ -894,55 +908,73 @@ OaksLabScript_1d157:
 	jr OaksLabLookAtBulbasaur
 
 OaksLabLookAtCharmander:
-  call IsMicoloName
-  jr c, .is_micolo
+; NUEVO PARA MICOLO PROTA
+    call IsMicoloName
+    jr c, .is_micolo
+; NUEVO PARA MICOLO PROTA
 	ld hl, OaksLabCharmanderText
 	jr OaksLabMonChoiceMenu
+	; NUEVO PARA MICOLO PROTA
 .is_micolo
 	ld hl, OaksLabMicoloStarter1Text
 	jr OaksLabMonChoiceMenu
+	; NUEVO PARA MICOLO PROTA
 
 OaksLabCharmanderText:
 	TX_FAR _OaksLabCharmanderText
 	db "@"
 
+; NUEVO PARA MICOLO PROTA
 OaksLabMicoloStarter1Text:
 	TX_FAR _OaksLabMicoloStarter1Text
 	db "@"
+; NUEVO PARA MICOLO PROTA
 
 OaksLabLookAtSquirtle:
+	; NUEVO PARA MICOLO PROTA
 	call IsMicoloName
 	jr c, .is_micolo
+	; NUEVO PARA MICOLO PROTA
 	ld hl, OaksLabSquirtleText
 	jr OaksLabMonChoiceMenu
+	; NUEVO PARA MICOLO PROTA
 .is_micolo
 	ld hl, OaksLabMicoloStarter2Text
 	jr OaksLabMonChoiceMenu
+	; NUEVO PARA MICOLO PROTA
 
 OaksLabSquirtleText:
 	TX_FAR _OaksLabSquirtleText
 	db "@"
 
+; NUEVO PARA MICOLO PROTA
 OaksLabMicoloStarter2Text:
 	TX_FAR _OaksLabMicoloStarter2Text
 	db "@"
+; NUEVO PARA MICOLO PROTA
 
 OaksLabLookAtBulbasaur:
-	call IsMicoloName
+; NUEVO PARA MICOLO PROTA
+    call IsMicoloName
 	jr c, .is_micolo
+; NUEVO PARA MICOLO PROTA
 	ld hl, OaksLabBulbasaurText
 	jr OaksLabMonChoiceMenu
+; NUEVO PARA MICOLO PROTA
 .is_micolo
 	ld hl, OaksLabMicoloStarter3Text
 	jr OaksLabMonChoiceMenu
+; NUEVO PARA MICOLO PROTA
 
 OaksLabBulbasaurText:
 	TX_FAR _OaksLabBulbasaurText
 	db "@"
 
+; NUEVO PARA MICOLO PROTA
 OaksLabMicoloStarter3Text:
 	TX_FAR _OaksLabMicoloStarter3Text
 	db "@"
+; NUEVO PARA MICOLO PROTA
 
 OaksLabMonChoiceMenu:
 	call PrintText
@@ -1074,6 +1106,12 @@ OaksLabText5:
 .asm_1d2c8
 	ld hl, OaksLabAroundWorldText
 	call PrintText
+	; NUEVO
+	lb bc, POKE_BALL, 5
+	call GiveItem
+	ld hl, OaksLabGivePokeballsText
+	call PrintText
+	; NUEVO
 	jr .asm_1d2ed
 .asm_1d2d0
 	CheckAndSetEvent EVENT_GOT_POKEBALLS_FROM_OAK

@@ -12,11 +12,16 @@ _ReceivedTM29Text::
 	text "!@@"
 
 _TM29ExplanationText::
-	text "TM29 is PSYCHIC!"
+	;text "TM29 is PSYCHIC!"
 
-	para "It can lower the"
-	line "target's SPECIAL"
-	cont "abilities."
+	;para "It can lower the"
+	;line "target's SPECIAL"
+	;cont "abilities."
+	text "TM46 is PSYWAVE!"
+	
+	para "It uses powerful"
+	line "psychic waves to"
+	cont "inflict damage!"
 	done
 
 _TM29NoRoomText::

@@ -151,5 +151,92 @@ const_value = 1
 	const DEX_DRAGONITE  ; 149
 	const DEX_MEWTWO     ; 150
 	const DEX_MEW        ; 151
+	const DEX_NOSEPASS   ;152
+	const DEX_PROBOPASS  ;153
+	const DEX_MIMIKYU    ;154
+	const DEX_TOGEPI     ;155
+	const DEX_TOGETIC    ;156
+	const DEX_YAMASK     ;157
+	const DEX_COFAGRIGUS ;158
+	const DEX_FOMANTIS   ;159
+	const DEX_LURANTIS   ;160
+	const DEX_ROWLET     ;161
+	const DEX_DARTRIX    ;162
+	const DEX_DECIDUEYE  ;163
+	const DEX_LITWICK  ;164
+	const DEX_LAMPENT    ;165
+	const DEX_CHANDELURE ;166
+	const DEX_MUDKIP     ;167
+	const DEX_MARSHTOMP  ;168
+	const DEX_SWAMPERT   ;169
+	const DEX_SWABLU     ;170
+	const DEX_ALTARIA    ;171
+	const DEX_GRUBBIN    ;172
+	const DEX_CHARJABUG  ;173
+	const DEX_VIKAVOLT   ;174
+	const DEX_SNEASEL    ;175
+	const DEX_SMEARGLE    ;176
+	const DEX_MICOMON   ; 177
+	const DEX_CROBAT     ; 178
+	const DEX_SCIZOR     ; 179
+	const DEX_TRAPINCH   ; 180
+	const DEX_VIBRAVA    ; 181
+	const DEX_FLYGON     ; 182
+	const DEX_SANDILE   ; 183
+	const DEX_KROKOROK   ; 184
+	const DEX_KROOKODILE   ; 185
+	const DEX_SOLOSIS    ; 186
+	const DEX_DUOSION    ; 187
+	const DEX_REUNICLUS  ; 188
+	const DEX_CATERMANO      ; 189
+	const DEX_LUCARIO    ; 190
+	const DEX_TIMBURR    ; 191
+	const DEX_GURDURR  ; 192
+	const DEX_CONKELDURR      ; 193
+	const DEX_TYRANITAR   ; 194
+	const DEX_STEELIX    ; 195
+	const DEX_BELDUM      ; 196
+	const DEX_METANG   ; 197
+	const DEX_METAGROSS   ; 198
+	const DEX_DARK_PIKA   ;199
+	const DEX_ZOROARK   ;200
+	const DEX_DRAMPA   ; 201
+	const DEX_WEAVILE   ; 202
+	const DEX_DRILLBUR   ;203
+	const DEX_EXCADRILL  ;204
+	const DEX_TYNAMO   ; 205
+	const DEX_EELEKTRIK   ;206
+	const DEX_EELEKTROSS  ;207
+	const DEX_SNOVER   ;208
+	const DEX_ABOMASNOW  ;209
+	const DEX_TOGEKISS   ;210
+	const DEX_HERACROSS  ;211
+	const DEX_ESPEON   ;212
+	const DEX_UMBREON  ;213
+	const DEX_LEAFEON  ;214
+	const DEX_GLACEON  ;215
+	const DEX_HOUNDOUR  ;216
+	const DEX_HOUNDOOM  ;217
+	const DEX_CHINCHOU   ;218
+	const DEX_LANTURN ;219
+	const DEX_MURKROW  ;220
+	const DEX_HONCHKROW  ;221
+	const DEX_HYDREIGON ;222
+	const DEX_CARVANHA ;223
+	const DEX_SHARPEDO  ;224
+	const DEX_NUMEL  ;225
+	const DEX_CAMERUPT  ;226
+	const DEX_RHYPERIOR ;227
+	const DEX_KINGDRA ;228
+	const DEX_SKARMORY  ;229
+	const DEX_SALAMENCE ;230
+	const DEX_MAGNEZONE ;231
+	const DEX_TANGROWTH ;232
+	const DEX_ELECTIVIRE  ;233
+	const DEX_MAGMORTAR ;234
+	const DEX_LICKILICKY ;235
+	const DEX_PORYGON2  ;236
+	const DEX_PORYGONZ ;237
 
-NUM_POKEMON    EQU 151
+
+NUM_POKEMON    EQU 237

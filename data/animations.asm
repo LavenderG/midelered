@@ -163,8 +163,21 @@ AttackAnimationPointers:
 	dw SuperFangAnim
 	dw SlashAnim
 	dw SubstituteAnim
-	dw MidelePowerAnim
-	dw DarkThunderAnim
+	dw DragonRageAnim ;DRAGONBREATH
+	dw SonicBoomAnim ; SHADOW BALL
+	dw SludgeAnim ; SLUDGE BOMB
+	dw BiteAnim ; CRUNCH
+	dw SlashAnim ; NIGHT SLASH
+	dw HeatButtAnim ; IRON HEAD
+	dw WingAttackAnim ;STEEL WING
+	dw ThrashAnim ;OUTRAGE
+	dw MegaDrainAnim ;GIGA DRAIN
+	dw MidelePowerAnim ; MIDELE POWER
+	dw DarkThunderAnim ; DARK THUNDER
+	dw MirrorMoveAnim ; SKETCH
+	dw SlashAnim ; X_SCISSOR
+	dw HornAttackAnim ; MEGAHORN
+	dw ThrashAnim ; BRICK_BREAK
 	dw StruggleAnim
 	dw ShowPicAnim
 	dw EnemyFlashAnim
@@ -677,7 +690,7 @@ ThunderWaveAnim:
 	db $04,$FF,$23
 	db $FF
 
-DarkThunderAnim:
+DarkThunderAnim: ;DARK THUNDER
 ThunderAnim:
 	db SE_DARK_SCREEN_PALETTE, $56
 	db SE_DARK_SCREEN_FLASH, $FF
@@ -1127,7 +1140,7 @@ SubstituteAnim:
 	db SE_SUBSTITUTE_MON, $FF
 	db $FF
 
-MidelePowerAnim:
+MidelePowerAnim: ; MIDELE POWER
 	db SE_DARK_SCREEN_PALETTE, $56
 	db SE_DARK_SCREEN_FLASH, $FF
 	db $46,$FF,$2B
@@ -1144,7 +1157,6 @@ MidelePowerAnim:
 	db $46,$FF,$0C
 	db $46,$FF,$0D
 	db $FF
-
 
 BallTossAnim:
 	db $03,$FF,$06

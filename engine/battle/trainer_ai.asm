@@ -1,7 +1,10 @@
 ; creates a set of moves that may be used and returns its address in hl
 ; unused slots are filled with 0, all used slots may be chosen with equal probability
 AIEnemyTrainerChooseMoves:
-	ld a, $a
+	; NUEVO PARA AI DE ENTRENADORES
+	;ld a, $a
+	ld a, $14 ; changed to give us more breathing room
+	; NUEVO PARA AI DE ENTRENADORES
 	ld hl, wBuffer ; init temporary move selection array. Only the moves with the lowest numbers are chosen in the end
 	ld [hli], a   ; move 1
 	ld [hli], a   ; move 2
@@ -107,7 +110,10 @@ AIMoveChoiceModificationFunctionPointers:
 	dw AIMoveChoiceModification1
 	dw AIMoveChoiceModification2
 	dw AIMoveChoiceModification3
-	dw AIMoveChoiceModification4 ; unused, does nothing
+	; NUEVO PARA AI DE ENTRENADORES
+	;dw AIMoveChoiceModification4 ; unused, does nothing
+	dw SmartAI ; unused, does nothing
+	; NUEVO PARA AI DE ENTRENADORES
 
 ; discourages moves that cause no damage but only a status ailment if player's mon already has one
 AIMoveChoiceModification1:
@@ -141,7 +147,10 @@ AIMoveChoiceModification1:
 	pop hl
 	jr nc, .nextMove
 	ld a, [hl]
-	add $5 ; heavily discourage move
+	; NUEVO PARA AI DE ENTRENADORES
+	;add $5 ; heavily discourage move
+	add $20 ; heavily discourage move
+	; NUEVO PARA AI DE ENTRENADORES
 	ld [hl], a
 	jr .nextMove
 
@@ -151,6 +160,256 @@ StatusAilmentMoveEffects:
 	db POISON_EFFECT
 	db PARALYZE_EFFECT
 	db $FF
+
+; NUEVO AI DE ENTRENADORES
+SmartAI:
+; damaging move priority on turn 3+
+    ld a, [wAILayer2Encouragement]
+    cp $2
+    jr c, .healingcheck
+    ld hl, wBuffer - 1
+    ld de, wEnemyMonMoves
+    ld b, NUM_MOVES + 1
+.damageloop
+    dec b
+    jr z, .healingcheck
+    inc hl
+    ld a, [de]
+    and a
+    jr z, .healingcheck
+    inc de
+    call ReadMove
+    ld a, [wEnemyMovePower]
+	and a
+    jr z, .damageloop
+; encourage by 2
+    dec [hl]
+    dec [hl]
+    jr .damageloop
+; healing moves?
+.healingcheck
+    ld a, [wEnemyMonMaxHP]
+    and a
+    jr z, .noscale
+    ld b, a
+    ld a, [wEnemyMonMaxHP+1]
+    srl b
+    rr a
+    ld b, a
+    ld a, [wEnemyMonHP]
+    ld c, a
+    ld a, [wEnemyMonHP+1]
+    srl c
+    rr a
+    ld c, a
+    jr .realhealcheck
+.noscale
+    ld a, [wEnemyMonMaxHP+1]
+    ld b, a
+    ld a, [wEnemyMonHP+1]
+    ld c, a
+.realhealcheck
+    srl b
+    ld a, c
+    cp b
+    ld hl, HealingMoves
+	jr nc, .debuffhealingmoves
+    ld b, -8
+	jr .applyhealingchange
+.debuffhealingmoves
+    ld b, 10
+.applyhealingchange
+    call AlterMovePriorityArray
+; dreameatercheck
+    ld a, [wBattleMonStatus]
+    and SLP
+    ld a, DREAM_EATER
+    ld [W_AIBUFFER1], a
+    jr z, .debuffdreameater
+    ld b, -1
+    jr .applydreameater
+.debuffdreameater
+    ld b, 20
+.applydreameater
+    call AlterMovePriority
+.effectivenesscheck
+; encourage any damaging move with SE; slightly discourage any NVE move but not by as much
+    ld hl, wBuffer - 1
+    ld de, wEnemyMonMoves
+    ld b, NUM_MOVES + 1
+.seloop
+    dec b
+    jr z, .selfbuffcheck
+    inc hl
+    ld a, [de]
+    and a
+    jr z, .selfbuffcheck
+    inc de
+    call ReadMove
+    ld a, [wEnemyMovePower]
+	and a
+    jr z, .seloop
+    push hl
+	push bc
+	push de
+	callab AIGetTypeEffectiveness
+	pop de
+	pop bc
+	pop hl
+    ld a, [wd11e]
+    cp $0a
+    jr z, .seloop
+    jr c, .nvemove
+; strongly encourage (SE)
+    rept 4
+    dec [hl]
+    endr
+    cp $15
+    jr c, .seloop
+; even more strongly encourage 4x SE
+    rept 3
+    dec [hl]
+    endr
+    jr .seloop
+.nvemove
+; slightly discourage
+    inc [hl]
+    and a
+    jr nz, .seloop
+; strongly discourage immunity
+    ld a, [hl]
+    add 50
+    ld [hl], a
+    jr .seloop
+.selfbuffcheck
+; strongly encourage self-buff or status on turn 1
+    ld a, [wAILayer2Encouragement]
+    and a
+    ret nz
+    ld hl, MehStatusMoves
+    ld b, -3
+    call AlterMovePriorityArray
+    ld hl, LightBuffStatusMoves
+    ld b, -5
+    call AlterMovePriorityArray
+    ld hl, HeavyBuffStatusMoves
+    ld b, -6
+    call AlterMovePriorityArray
+    ret
+    
+MehStatusMoves:
+    db GROWL
+    db DISABLE
+    db MIST
+    db HARDEN
+    db WITHDRAW
+    db DEFENSE_CURL
+    db TAIL_WHIP
+    db LEER
+    db $FF
+    
+LightBuffStatusMoves:
+    db GROWTH
+    db MEDITATE
+    db AGILITY
+    db MINIMIZE
+    db DOUBLE_TEAM
+    db REFLECT
+    db LIGHT_SCREEN
+    db BARRIER
+    db SUBSTITUTE
+    db POISONPOWDER
+    db STRING_SHOT
+    db SCREECH
+    db SMOKESCREEN
+    db POISON_GAS
+    db FLASH
+    db SHARPEN
+    db SAND_ATTACK
+    db $FF
+HeavyBuffStatusMoves:
+    db SWORDS_DANCE
+    db AMNESIA
+    db SING
+    db SLEEP_POWDER
+    db HYPNOSIS
+    db LOVELY_KISS
+    db SPORE
+    db STUN_SPORE
+    db THUNDER_WAVE
+    db GLARE
+    db CONFUSE_RAY
+	db SUPERSONIC
+    db $FF
+    
+HealingMoves:
+    db REST
+    db RECOVER
+    db SOFTBOILED
+    db $FF
+AlterMovePriority:
+; [W_AIBUFFER1] = move
+; b = priority change
+    ld hl, wBuffer - 1
+    ld de, wEnemyMonMoves
+    ld c, NUM_MOVES+1
+.moveloop
+    dec c
+    ret z
+    inc hl
+    ld a, [de]
+    and a
+    ret z
+    inc de
+    push bc
+    ld b, a
+    ld a, [W_AIBUFFER1]
+    cp b
+    pop bc
+    jr nz, .moveloop
+    ld a, [hl]
+    add b
+    ld [hl], a
+    ret
+    
+AlterMovePriorityArray:
+; hl = move array
+; b = priority change
+    ld a, h
+    ld [W_AIBUFFER1], a
+    ld a, l
+    ld [W_AIBUFFER2], a
+    ld hl, wBuffer - 1
+    ld de, wEnemyMonMoves
+    ld c, NUM_MOVES+1
+.moveloop
+    dec c
+    ret z
+    inc hl
+    ld a, [de]
+    and a
+    ret z
+    inc de
+    push hl
+	push de
+	push bc
+    ld b, a
+    ld a, [W_AIBUFFER1]
+    ld h, a
+    ld a, [W_AIBUFFER2]
+    ld l, a
+    ld a, b
+	ld de, $0001
+	call IsInArray
+	pop bc
+	pop de
+	pop hl
+    jr nc, .moveloop
+    ld a, [hl]
+    add b
+    ld [hl], a
+    ret
+; NUEVO AI DE ENTRENADORES	
 
 ; slightly encourage moves with specific effects.
 ; in particular, stat-modifying moves and other move effects
@@ -276,53 +535,60 @@ ReadMove:
 ; move choice modification methods that are applied for each trainer class
 ; 0 is sentinel value
 TrainerClassMoveChoiceModifications:
-	db 0      ; YOUNGSTER
-	db 1,0    ; BUG CATCHER
-	db 1,0    ; LASS
-	db 1,3,0  ; SAILOR
-	db 1,0    ; JR_TRAINER_M
-	db 1,0    ; JR_TRAINER_F
-	db 1,2,3,0; POKEMANIAC
-	db 1,2,0  ; SUPER_NERD
-	db 1,0    ; HIKER
-	db 1,0    ; BIKER
-	db 1,3,0  ; BURGLAR
-	db 1,0    ; ENGINEER
-	db 1,2,0  ; JUGGLER_X
-	db 1,3,0  ; FISHER
-	db 1,3,0  ; SWIMMER
-	db 0      ; CUE_BALL
-	db 1,0    ; GAMBLER
-	db 1,3,0  ; BEAUTY
-	db 1,2,0  ; PSYCHIC_TR
-	db 1,3,0  ; ROCKER
-	db 1,0    ; JUGGLER
-	db 1,0    ; TAMER
-	db 1,0    ; BIRD_KEEPER
-	db 1,0    ; BLACKBELT
-	db 1,0    ; SONY1
-	db 1,3,0  ; PROF_OAK
-	db 1,2,0  ; CHIEF
-	db 1,2,0  ; SCIENTIST
-	db 1,3,0  ; GIOVANNI
-	db 1,0    ; ROCKET
-	db 1,3,0  ; COOLTRAINER_M
-	db 1,3,0  ; COOLTRAINER_F
-	db 1,0    ; BRUNO
-	db 1,0    ; BROCK
-	db 1,3,0  ; MISTY
-	db 1,3,0  ; LT_SURGE
-	db 1,3,0  ; ERIKA
-	db 1,3,0  ; KOGA
-	db 1,3,0  ; BLAINE
-	db 1,3,0  ; SABRINA
-	db 1,2,0  ; GENTLEMAN
-	db 1,3,0  ; SONY2
-	db 1,3,0  ; SONY3
-	db 1,2,3,0; LORELEI
-	db 1,0    ; CHANNELER
-	db 1,0    ; AGATHA
-	db 1,3,0  ; LANCE
+    db 1,4,0      ; YOUNGSTER
+    db 1,4,0     ; BUG CATCHER
+    db 1,4,0     ; LASS
+    db 1,3,0  ; SAILOR
+    db 1,4,0     ; JR_TRAINER_M
+    db 1,4,0     ; JR_TRAINER_F
+    db 1,2,3,0; POKEMANIAC
+    db 1,2,0  ; SUPER_NERD
+    db 1,4,0     ; HIKER
+    db 1,0    ; BIKER
+    db 1,3,0  ; BURGLAR
+    db 1,0    ; ENGINEER
+    db 1,2,0  ; JUGGLER_X
+    db 1,3,0  ; FISHER
+    db 1,3,0  ; SWIMMER
+    db 0      ; CUE_BALL
+    db 1,0    ; GAMBLER
+    db 1,3,0  ; BEAUTY
+    db 1,2,0  ; PSYCHIC_TR
+    db 1,3,0  ; ROCKER
+    db 1,0    ; JUGGLER
+    db 1,0    ; TAMER
+    db 1,0    ; BIRD_KEEPER
+    db 1,0    ; BLACKBELT
+    db 1,4,0     ; SONY1
+    db 1,3,0  ; PROF_OAK
+    db 1,2,0  ; CHIEF
+    db 1,2,0  ; SCIENTIST
+    db 1,3,0  ; GIOVANNI
+    db 1,0    ; ROCKET
+    db 1,3,0  ; COOLTRAINER_M
+    db 1,3,0  ; COOLTRAINER_F
+    db 1,0    ; BRUNO
+    db 1,4,0     ; BROCK
+    db 1,4,0   ; MISTY
+    db 1,3,0  ; LT_SURGE
+    db 1,3,0  ; ERIKA
+    db 1,3,0  ; KOGA
+    db 1,3,0  ; BLAINE
+    db 1,3,0  ; SABRINA
+    db 1,2,0  ; GENTLEMAN
+    db 1,4,0   ; SONY2
+    db 1,4,0   ; SONY3
+    db 1,2,3,0; LORELEI
+    db 1,0    ; CHANNELER
+    db 1,0    ; AGATHA
+    db 1,3,0  ; LANCE
+	db 1,3,0  ; RAGU 	; NUEVO AÑADIENDO UN ENTRENADOR
+	db 1,4,0  ; GOLDY 	; NUEVO AÑADIENDO UN ENTRENADOR
+	db 1,3,0  ; UTALAWEA 	; NUEVO AÑADIENDO UN ENTRENADOR
+	db 1,4,0  ; EEVEETO 	; NUEVO AÑADIENDO UN ENTRENADOR
+	db 1,3,0  ; JAVISIT	; NUEVO AÑADIENDO UN ENTRENADOR
+	db 1,3,0  ; MANEC	; NUEVO AÑADIENDO UN ENTRENADOR
+	db 1,3,0  ; DARKI	; NUEVO AÑADIENDO UN ENTRENADOR
 
 INCLUDE "engine/battle/trainer_pic_money_pointers.asm"
 
@@ -332,7 +598,7 @@ INCLUDE "engine/battle/bank_e_misc.asm"
 
 INCLUDE "engine/battle/read_trainer_party.asm"
 
-INCLUDE "engine/battle/leader_level.asm"
+INCLUDE "engine/battle/leader_level.asm" ; NUEVO PARA NIVELES DINAMICOS DE ENTRENADO
 
 INCLUDE "data/trainer_moves.asm"
 
@@ -386,7 +652,7 @@ TrainerAIPointers:
 	dbw 3,GenericAI
 	dbw 3,GenericAI
 	dbw 3,GenericAI
-	dbw 3,JugglerAI ; juggler_x
+	dbw 3,GenericAI ;dbw 3,JugglerAI ; juggler_x
 	dbw 3,GenericAI
 	dbw 3,GenericAI
 	dbw 3,GenericAI
@@ -394,153 +660,160 @@ TrainerAIPointers:
 	dbw 3,GenericAI
 	dbw 3,GenericAI
 	dbw 3,GenericAI
-	dbw 3,JugglerAI ; juggler
+	dbw 3,GenericAI  ;dbw 3,JugglerAI ; juggler
 	dbw 3,GenericAI
 	dbw 3,GenericAI
-	dbw 2,BlackbeltAI ; blackbelt
+	dbw 3,GenericAI ;dbw 2,BlackbeltAI ; blackbelt
 	dbw 3,GenericAI
 	dbw 3,GenericAI
 	dbw 1,GenericAI ; chief
 	dbw 3,GenericAI
-	dbw 1,GiovanniAI ; giovanni
+    dbw 3,GenericAI ;dbw 1,GiovanniAI ; giovanni
 	dbw 3,GenericAI
-	dbw 2,CooltrainerMAI ; cooltrainerm
-	dbw 1,CooltrainerFAI ; cooltrainerf
-	dbw 2,BrunoAI ; bruno
-	dbw 5,BrockAI ; brock
-	dbw 1,MistyAI ; misty
-	dbw 1,LtSurgeAI ; surge
-	dbw 1,ErikaAI ; erika
-	dbw 2,KogaAI ; koga
-	dbw 2,BlaineAI ; blaine
-	dbw 1,SabrinaAI ; sabrina
+	dbw 3,GenericAI ;dbw 2,CooltrainerMAI ; cooltrainerm
+	dbw 3,GenericAI ;dbw 1,CooltrainerFAI ; cooltrainerf
+	dbw 3,GenericAI ;dbw 2,BrunoAI ; bruno
+	dbw 3,GenericAI ;dbw 5,BrockAI ; brock
+	dbw 3,GenericAI ;dbw 1,MistyAI ; misty
+	dbw 3,GenericAI ;dbw 1,LtSurgeAI ; surge
+	dbw 3,GenericAI ;dbw 1,ErikaAI ; erika
+	dbw 3,GenericAI ;dbw 2,KogaAI ; koga
+	dbw 3,GenericAI ;dbw 2,BlaineAI ; blaine
+	dbw 3,GenericAI ;dbw 1,SabrinaAI ; sabrina
 	dbw 3,GenericAI
-	dbw 1,Sony2AI ; sony2
-	dbw 1,Sony3AI ; sony3
-	dbw 2,LoreleiAI ; lorelei
+	dbw 3,GenericAI ;dbw 1,Sony2AI ; sony2
+	dbw 3,GenericAI ;dbw 1,Sony3AI ; sony3
+	dbw 3,GenericAI ;dbw 2,LoreleiAI ; lorelei
 	dbw 3,GenericAI
-	dbw 2,AgathaAI ; agatha
-	dbw 1,LanceAI ; lance
+	dbw 3,GenericAI ;dbw 2,AgathaAI ; agatha
+	dbw 3,GenericAI ;dbw 1,LanceAI ; lance
+	dbw 3,GenericAI ; RAGU 	; NUEVO AÑADIENDO UN ENTRENADOR
+	dbw 3,GenericAI ; GOLDY 	; NUEVO AÑADIENDO UN ENTRENADOR
+	dbw 3,GenericAI ; UTALAWEA 	; NUEVO AÑADIENDO UN ENTRENADOR
+	dbw 3,GenericAI ; EEVEETO 	; NUEVO AÑADIENDO UN ENTRENADOR
+	dbw 3,GenericAI ; JAVISIT 	; NUEVO AÑADIENDO UN ENTRENADOR
+	dbw 3,GenericAI ; MANEC	; NUEVO AÑADIENDO UN ENTRENADOR
+	dbw 3,GenericAI ; DARKI	; NUEVO AÑADIENDO UN ENTRENADOR
 
-JugglerAI:
-	cp $40
-	ret nc
-	jp AISwitchIfEnoughMons
+;JugglerAI:
+;	cp $40
+;	ret nc
+;	jp AISwitchIfEnoughMons
 
-BlackbeltAI:
-	cp $20
-	ret nc
-	jp AIUseXAttack
+;BlackbeltAI:
+;	cp $20
+;	ret nc
+;	jp AIUseXAttack
 
-GiovanniAI:
-	cp $40
-	ret nc
-	jp AIUseGuardSpec
+;GiovanniAI:
+;	cp $40
+;	ret nc
+;	jp AIUseGuardSpec
 
-CooltrainerMAI:
-	cp $40
-	ret nc
-	jp AIUseXAttack
+;CooltrainerMAI:
+;	cp $40
+;	ret nc
+;	jp AIUseXAttack
 
-CooltrainerFAI:
-	cp $40
-	ld a, $A
-	call AICheckIfHPBelowFraction
-	jp c, AIUseHyperPotion
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AISwitchIfEnoughMons
+;CooltrainerFAI:
+;	cp $40
+;	ld a, $A
+;	call AICheckIfHPBelowFraction
+;	jp c, AIUseHyperPotion
+;	ld a, 5
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AISwitchIfEnoughMons
 
-BrockAI:
+;BrockAI:
 ; if his active monster has a status condition, use a full heal
-	ld a, [wEnemyMonStatus]
-	and a
-	ret z
-	jp AIUseFullHeal
+;	ld a, [wEnemyMonStatus]
+;	and a
+;	ret z
+;	jp AIUseFullHeal
 
-MistyAI:
-	cp $40
-	ret nc
-	jp AIUseXDefend
+;MistyAI:
+;	cp $40
+;	ret nc
+;	jp AIUseXDefend
 
-LtSurgeAI:
-	cp $40
-	ret nc
-	jp AIUseXSpeed
+;LtSurgeAI:
+;	cp $40
+;	ret nc
+;	jp AIUseXSpeed
 
-ErikaAI:
-	cp $80
-	ret nc
-	ld a, $A
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseSuperPotion
+;ErikaAI:
+;	cp $80
+;	ret nc
+;	ld a, $A
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AIUseSuperPotion
 
-KogaAI:
-	cp $40
-	ret nc
-	jp AIUseXAttack
+;KogaAI:
+;	cp $40
+;	ret nc
+;	jp AIUseXAttack
 
-BlaineAI:
-	cp $40
-	ret nc
-	jp AIUseSuperPotion
+;BlaineAI:
+;	cp $40
+;	ret nc
+;	jp AIUseSuperPotion
 
-SabrinaAI:
-	cp $40
-	ret nc
-	ld a, $A
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseHyperPotion
+;SabrinaAI:
+;	cp $40
+;	ret nc
+;	ld a, $A
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AIUseHyperPotion
 
-Sony2AI:
-	cp $20
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUsePotion
+;Sony2AI:
+;	cp $20
+;	ret nc
+;	ld a, 5
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AIUsePotion
 
-Sony3AI:
-	cp $20
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseFullRestore
+;Sony3AI:
+;	cp $20
+;	ret nc
+;	ld a, 5
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AIUseFullRestore
 
-LoreleiAI:
-	cp $80
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseSuperPotion
+;LoreleiAI:
+;	cp $80
+;	ret nc
+;	ld a, 5
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AIUseSuperPotion
 
-BrunoAI:
-	cp $40
-	ret nc
-	jp AIUseXDefend
+;BrunoAI:
+;	cp $40
+;	ret nc
+;	jp AIUseXDefend
 
-AgathaAI:
-	cp $14
-	jp c, AISwitchIfEnoughMons
-	cp $80
-	ret nc
-	ld a, 4
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseSuperPotion
+;AgathaAI:
+;	cp $14
+;	jp c, AISwitchIfEnoughMons
+;	cp $80
+;	ret nc
+;	ld a, 4
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AIUseSuperPotion
 
-LanceAI:
-	cp $80
-	ret nc
-	ld a, 5
-	call AICheckIfHPBelowFraction
-	ret nc
-	jp AIUseHyperPotion
+;LanceAI:
+;	cp $80
+;	ret nc
+;	ld a, 5
+;	call AICheckIfHPBelowFraction
+;	ret nc
+;	jp AIUseHyperPotion
 
 GenericAI:
 	and a ; clear carry

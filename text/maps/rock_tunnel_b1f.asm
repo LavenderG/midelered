@@ -113,3 +113,37 @@ _RockTunnel1Text8::
 	line "CERULEAN CITY -"
 	cont "LAVENDER TOWN"
 	done
+
+_RockTunnel1BattleText8::
+    text "Al fin encuentro a"
+    line "alguien que hable"
+    cont "en castellano."
+
+    para "Me presento: soy"
+    line "MANEC, coautor de"
+    cont "una SPAM"
+	cont "CENSURADO muy"
+	cont "chula. Espero"
+    cont "que la visites!"
+
+    para "Bueno, segun las"
+    line "reglas absurdas"
+    para " de este mundo,"
+	line "ahora debemos"
+	cont "luchar..."
+    done
+
+_RockTunnel1EndBattleText8::
+    text "..."
+	line "Caguen..."
+    prompt
+
+_RockTunnel1AfterBattleText8::
+    text "Es el entrenador"
+    line "el que elige al"
+    cont "#MON y es el"
+	cont "#MON el que"
+	cont "quiere que sea"
+	cont "el entrenador"
+    cont "el #MON."
+    done

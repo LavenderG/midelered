@@ -350,6 +350,8 @@ wSerialEnemyMonsPatchList:: ; c5d0
 
 	ds 80
 
+wTempLevel:: ; ??????NUEVO??? DE PARA CORREGIR Do not skip moves if you skipped that level 
+wGenderTemp::  ; NUEVO PARA SHINY????
 wTempPic::
 wOverworldMap:: ; c6e8
 	ds 1300
@@ -600,8 +602,26 @@ wAnimPalette:: ; cc79
 
 wNPCMovementDirections2:: ; cc97
 
+; NUEVO PARA SHINY
+wShinyMonFlag:: ; cc97 
+; Bit 0 is set if the mon should be shiny
+; Bit 1 is set for enemy mon animation, reset for player mon animation
+; NUEVO PARA SHINY
+
 wSwitchPartyMonTempBuffer:: ; cc97
 ; temporary buffer when swapping party mon data
+; NUEVO MOVEREARNER
+wRelearnableMoves::
+; List of move ids that can be re-learend (Move Relearner)
+; First byte is the number of moves in this list.
+; List is terminated with $ff
+wMoveRelearnerFlags::
+; Bit 0 is set if a move was replaced. Reset if player canceled.
+wDeletableMoves::
+; List of move ids that can be deleted (Move Deleter)
+; First byte is the number of moves in this list.
+; List is terminated with $ff
+; NUEVO MOVE RELEARNER Y DELETER
 	ds 10
 
 wNumStepsToTake:: ; cca1
@@ -1815,7 +1835,13 @@ wSavedListScrollOffset:: ; d07e
 ; so that it can be restored when the player is done with the pokemart NPC
 	ds 1
 
-	ds 2
+; NUEVO PARA SKETCH
+	;ds 2
+wBattlePreviousEnemyAttack:: ; d07f
+	ds 1
+wBattlePreviousPlayerAttack:: ; d080
+	ds 1
+; NUEVO PARA SKETCH
 
 ; base coordinates of frame block
 wBaseCoordX:: ; d081
@@ -2068,6 +2094,8 @@ wMonHGrowthRate:: ; d0cb
 wMonHLearnset:: ; d0cc
 ; bit field
 	flag_array 50 + 5
+
+wMonHPicBank:: ; d0d3  ; NUEVO PARA SPRITES	
 	ds 1
 
 wSavedTilesetType:: ; d0d4
@@ -2320,10 +2348,12 @@ wPokedexOwned:: ; d2f7
 	flag_array NUM_POKEMON
 wPokedexOwnedEnd::
 
-wPokedexSeen:: ; d30a
-	flag_array NUM_POKEMON
-wPokedexSeenEnd::
-
+; MODIFICADO Y BORRADO PARA ARREGLAR STACK DF00 POR FALTA DE ESPACIO  https://hax.iimarckus.org/post/47481/
+;wPokedexSeen:: ; d30a
+;	flag_array NUM_POKEMON
+;wPokedexSeenEnd::
+    flag_array 2 * 151 - NUM_POKEMON
+wPokedexSeenEndOld::
 
 wNumBagItems:: ; d31d
 	ds 1
@@ -2535,7 +2565,13 @@ wSpriteSetID:: ; d3a8
 wObjectDataPointerTemp:: ; d3a9
 	ds 2
 
-	ds 2
+; NUEVO PARA SHINY
+;	ds 2
+wNextEncounterLevel:: ; d3aa
+	ds 1
+wNextEncounterSpecies:: ; d3ab
+	ds 1
+; NUEVO PARA SHINY
 
 wMapBackgroundTile:: ; d3ad
 ; the tile shown outside the boundaries of the map
@@ -2553,7 +2589,14 @@ wDestinationWarpID:: ; d42f
 ; if $ff, the player's coordinates are not updated when entering the map
 	ds 1
 
-	ds 128
+; MODIFICADO Y BORRADO PARA ARREGLAR STACK DF00 POR FALTA DE ESPACIO  https://hax.iimarckus.org/post/47481/
+wPokedexSeen::
+    flag_array NUM_POKEMON
+wPokedexSeenEnd::
+
+    ds 128 - (wPokedexSeenEnd - wPokedexSeen)
+	;ds 128
+; MODIFICADO Y BORRADO PARA ARREGLAR STACK DF00 POR FALTA DE ESPACIO  https://hax.iimarckus.org/post/47481/
 
 wNumSigns:: ; d4b0
 ; number of signs in the current map (up to 16)
@@ -2887,6 +2930,12 @@ wRoute23CurScript:: ; d667
 	ds 1
 wSeafoamIslands5CurScript:: ; d668
 	ds 1
+; NUEVO
+wRoute2CurScript:: ; 
+	ds 1
+wUnknownDungeon1CurScript:: ; 
+	ds 1
+; NUEVO
 wRoute18GateCurScript:: ; d669
 	ds 1
 
@@ -3203,8 +3252,18 @@ wBoxMonNicksEnd:: ; dee2
 
 wBoxDataEnd::
 
+W_AIBUFFER1:: ds 1  ; NUEVO PARA AI ENTRENADORES
+W_AIBUFFER2:: ds 1 ; NUEVO PARA AI ENTRENADORES
+; NUEVO PARA BATTLE EXP
+wEXPBarPixelLength:: ds 1
+wEXPBarBaseEXP:: ds 3
+wEXPBarCurEXP:: ds 3
+wEXPBarNeededEXP:: ds 3
+wEXPBarKeepFullFlag:: ds 1
+; NUEVO PARA BATTLE EXP	
 
-SECTION "Stack", WRAM0[$df00]
+
+SECTION "Stack", WRAM0[$df00]  ; NUEVO antes df01, no se si es la forma de arreglarlo para que quepan pokes apartir de 215 mas o menos
 	ds $ff
 wStack:: ; dfff
 

@@ -66,40 +66,84 @@ PlayDefaultMusicCommon::
 	ld [wNewSoundID], a
 	jp PlaySound
 
+; NUEVO PARA MUSICAS, COMENTANDO LO DE ABAJO PARA BACKUP ANTERIOR
+;UpdateMusic6Times::
+;; This is called when entering a map, before fading out the current music and
+;; playing the default music (i.e. the map's music or biking/surfing music).
+;	ld a, [wAudioROMBank]
+;	ld b, a
+;	cp BANK(Audio1_UpdateMusic)
+;	jr nz, .checkForAudio2
+
+; audio 1
+;	ld hl, Audio1_UpdateMusic
+;	jr .next
+
+;.checkForAudio2
+;	cp BANK(Audio2_UpdateMusic)
+;	jr nz, .audio3
+
+; audio 2
+;	ld hl, Audio2_UpdateMusic
+;	jr .next
+
+;.audio3
+;	ld hl, Audio3_UpdateMusic
+
+;.next
+;	ld c, 6
+;.loop
+;	push bc
+;	push hl
+;	call Bankswitch
+;	pop hl
+;	pop bc
+;	dec c
+;	jr nz, .loop
+;	ret
 UpdateMusic6Times::
 ; This is called when entering a map, before fading out the current music and
 ; playing the default music (i.e. the map's music or biking/surfing music).
-	ld a, [wAudioROMBank]
-	ld b, a
-	cp BANK(Audio1_UpdateMusic)
-	jr nz, .checkForAudio2
+    ld a, [wAudioROMBank]
+    ld b, a
+    cp BANK(Audio1_UpdateMusic)
+    jr nz, .checkForAudio2
 
 ; audio 1
-	ld hl, Audio1_UpdateMusic
-	jr .next
+    ld hl, Audio1_UpdateMusic
+    jr .next
 
 .checkForAudio2
-	cp BANK(Audio2_UpdateMusic)
-	jr nz, .audio3
+    cp BANK(Audio2_UpdateMusic)
+    jr nz, .checkForAudio3
 
 ; audio 2
-	ld hl, Audio2_UpdateMusic
-	jr .next
+    ld hl, Audio2_UpdateMusic
+    jr .next
 
-.audio3
-	ld hl, Audio3_UpdateMusic
+.checkForAudio3
+    cp BANK(Audio3_UpdateMusic)
+    jr nz, .audio4
+
+; audio 3
+    ld hl, Audio3_UpdateMusic
+    jr .next
+
+.audio4
+    ld hl, Audio4_UpdateMusic
 
 .next
-	ld c, 6
+    ld c, 6
 .loop
-	push bc
-	push hl
-	call Bankswitch
-	pop hl
-	pop bc
-	dec c
-	jr nz, .loop
-	ret
+    push bc
+    push hl
+    call Bankswitch
+    pop hl
+    pop bc
+    dec c
+    jr nz, .loop
+    ret
+;NUEVO PARA MUSICA
 
 CompareMapMusicBankWithCurrentBank::
 ; Compares the map music's audio ROM bank with the current audio ROM bank
@@ -138,63 +182,130 @@ PlayMusic::
 	ld [wAudioSavedROMBank], a
 	ld a, b
 
-; plays music specified by a. If value is $ff, music is stopped
-PlaySound::
-	push hl
-	push de
-	push bc
-	ld b, a
-	ld a, [wNewSoundID]
-	and a
-	jr z, .next
-	xor a
-	ld [wChannelSoundIDs + Ch4], a
-	ld [wChannelSoundIDs + Ch5], a
-	ld [wChannelSoundIDs + Ch6], a
-	ld [wChannelSoundIDs + Ch7], a
-.next
-	ld a, [wAudioFadeOutControl]
-	and a ; has a fade-out length been specified?
-	jr z, .noFadeOut
-	ld a, [wNewSoundID]
-	and a ; is the new sound ID 0?
-	jr z, .done ; if so, do nothing
-	xor a
-	ld [wNewSoundID], a
-	ld a, [wLastMusicSoundID]
-	cp $ff ; has the music been stopped?
-	jr nz, .fadeOut ; if not, fade out the current music
-; If it has been stopped, start playing the new music immediately.
-	xor a
-	ld [wAudioFadeOutControl], a
-.noFadeOut
-	xor a
-	ld [wNewSoundID], a
-	ld a, [H_LOADEDROMBANK]
-	ld [hSavedROMBank], a
-	ld a, [wAudioROMBank]
-	ld [H_LOADEDROMBANK], a
-	ld [MBC1RomBank], a
-	cp BANK(Audio1_PlaySound)
-	jr nz, .checkForAudio2
+; NUEVO PARA MUSICA, COMENTADO LO DE ABAJO PARA BACKUP
+;; plays music specified by a. If value is $ff, music is stopped
+;PlaySound::
+;	push hl
+;	push de
+;	push bc
+;	ld b, a
+;	ld a, [wNewSoundID]
+;	and a
+;	jr z, .next
+;	xor a
+;	ld [wChannelSoundIDs + Ch4], a
+;	ld [wChannelSoundIDs + Ch5], a
+;	ld [wChannelSoundIDs + Ch6], a
+;	ld [wChannelSoundIDs + Ch7], a
+;.next
+;	ld a, [wAudioFadeOutControl]
+;	and a ; has a fade-out length been specified?
+;	jr z, .noFadeOut
+;	ld a, [wNewSoundID]
+;	and a ; is the new sound ID 0?
+;	jr z, .done ; if so, do nothing
+;	xor a
+;	ld [wNewSoundID], a
+;	ld a, [wLastMusicSoundID]
+;	cp $ff ; has the music been stopped?
+;	jr nz, .fadeOut ; if not, fade out the current music
+;; If it has been stopped, start playing the new music immediately.
+;	xor a
+;	ld [wAudioFadeOutControl], a
+;.noFadeOut
+;	xor a
+;	ld [wNewSoundID], a
+;	ld a, [H_LOADEDROMBANK]
+;	ld [hSavedROMBank], a
+;	ld a, [wAudioROMBank]
+;	ld [H_LOADEDROMBANK], a
+;	ld [MBC1RomBank], a
+;	cp BANK(Audio1_PlaySound)
+;	jr nz, .checkForAudio2
 
 ; audio 1
-	ld a, b
-	call Audio1_PlaySound
-	jr .next2
+;	ld a, b
+;	call Audio1_PlaySound
+;	jr .next2
 
-.checkForAudio2
-	cp BANK(Audio2_PlaySound)
-	jr nz, .audio3
+;.checkForAudio2
+;	cp BANK(Audio2_PlaySound)
+;	jr nz, .audio3
 
 ; audio 2
-	ld a, b
-	call Audio2_PlaySound
-	jr .next2
+;	ld a, b
+;	call Audio2_PlaySound
+;	jr .next2
 
-.audio3
-	ld a, b
-	call Audio3_PlaySound
+;.audio3
+;	ld a, b
+;	call Audio3_PlaySound
+PlaySound::
+    push hl
+    push de
+    push bc
+    ld b, a
+    ld a, [wNewSoundID]
+    and a
+    jr z, .next
+    xor a
+    ld [wChannelSoundIDs + Ch4], a
+    ld [wChannelSoundIDs + Ch5], a
+    ld [wChannelSoundIDs + Ch6], a
+    ld [wChannelSoundIDs + Ch7], a
+.next
+    ld a, [wAudioFadeOutControl]
+    and a ; has a fade-out length been specified?
+    jr z, .noFadeOut
+    ld a, [wNewSoundID]
+    and a ; is the new sound ID 0?
+    jr z, .done ; if so, do nothing
+    xor a
+    ld [wNewSoundID], a
+    ld a, [wLastMusicSoundID]
+    cp $ff ; has the music been stopped?
+    jr nz, .fadeOut ; if not, fade out the current music
+; If it has been stopped, start playing the new music immediately.
+    xor a
+    ld [wAudioFadeOutControl], a
+.noFadeOut
+    xor a
+    ld [wNewSoundID], a
+    ld a, [H_LOADEDROMBANK]
+    ld [hSavedROMBank], a
+    ld a, [wAudioROMBank]
+    ld [H_LOADEDROMBANK], a
+    ld [MBC1RomBank], a
+    cp BANK(Audio1_PlaySound)
+    jr nz, .checkForAudio2
+
+; audio 1
+    ld a, b
+    call Audio1_PlaySound
+    jr .next2
+
+.checkForAudio2
+    cp BANK(Audio2_PlaySound)
+    jr nz, .checkForAudio3
+
+; audio 2
+    ld a, b
+    call Audio2_PlaySound
+    jr .next2
+
+.checkForAudio3
+    cp BANK(Audio3_PlaySound)
+    jr nz, .audio4
+
+; audio 3
+    ld a, b
+    call Audio3_PlaySound
+    jr .next2
+
+.audio4
+    ld a, b
+    call Audio4_PlaySound
+; NUEVO PARA MUSICA
 
 .next2
 	ld a, [hSavedROMBank]

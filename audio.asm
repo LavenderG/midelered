@@ -2,6 +2,7 @@
 AUDIO_1 EQU $2
 AUDIO_2 EQU $8
 AUDIO_3 EQU $1f
+AUDIO_4 EQU $2e  ; NUEVO PARA MUSICAS
 
 INCLUDE "constants.asm"
 
@@ -15,8 +16,6 @@ INCLUDE "audio/headers/sfxheaders2.asm"
 SECTION "Sound Effect Headers 3", ROMX, BANK[AUDIO_3]
 INCLUDE "audio/headers/sfxheaders3.asm"
 
-
-
 SECTION "Music Headers 1", ROMX, BANK[AUDIO_1]
 INCLUDE "audio/headers/musicheaders1.asm"
 
@@ -26,7 +25,10 @@ INCLUDE "audio/headers/musicheaders2.asm"
 SECTION "Music Headers 3", ROMX, BANK[AUDIO_3]
 INCLUDE "audio/headers/musicheaders3.asm"
 
-
+; NUEVO PARA MUSICA
+SECTION "Music Headers 4", ROMX, BANK[AUDIO_4]
+INCLUDE "audio/headers/musicheaders4.asm"
+; NUEVO PARA MUSICA
 
 SECTION "Sound Effects 1", ROMX, BANK[AUDIO_1]
 
@@ -358,7 +360,10 @@ INCLUDE "audio/sfx/cry20_3.asm"
 INCLUDE "audio/sfx/cry21_3.asm"
 INCLUDE "audio/sfx/cry22_3.asm"
 
-
+; NUEVO PARA MUSICAS
+SECTION "Sound Effects 4", ROMX, BANK[AUDIO_4]
+Audio4_WavePointers: INCLUDE "audio/wave_instruments.asm"
+; NUEVO PARA MUSICAS
 
 SECTION "Audio Engine 1", ROMX, BANK[AUDIO_1]
 
@@ -388,6 +393,8 @@ PlayBattleMusic::
 	jr .playSong
 .normalTrainerBattle
 	ld a, MUSIC_TRAINER_BATTLE
+	;ld a, MUSIC_HEARTMULHOLLAND
+	;jp .heartMulholland
 	jr .playSong
 .finalBattle
 	ld a, MUSIC_FINAL_BATTLE
@@ -397,6 +404,18 @@ PlayBattleMusic::
 .playSong
 	jp PlayMusic
 
+; NUEVO PARA MUSICA
+;.heartMulholland
+ ;   ld a, MUSIC_WILD_BATTLE
+  ;  call PlayMusic
+   ; ld hl, $C006
+  ;  ld de, Music_HeartMulholland_Ch0
+  ;  call Audio2_OverwriteChannelPointer
+  ;  ld de, Music_HeartMulholland_Ch1
+  ;  call Audio2_OverwriteChannelPointer
+  ;  ld de, Music_HeartMulholland_Ch2
+  ;  jp Audio2_OverwriteChannelPointer
+; NUEVO PARA MUSICA
 
 INCLUDE "audio/engine_1.asm"
 
@@ -599,7 +618,11 @@ OwnedMonValues:
 
 INCLUDE "audio/engine_3.asm"
 
+; NUEVO PARA MUSICAS
+SECTION "Audio Engine 4", ROMX, BANK[AUDIO_4]
 
+INCLUDE "audio/engine_4.asm"
+; NUEVO PARA MUSICAS
 
 SECTION "Music 1", ROMX, BANK[AUDIO_1]
 
@@ -645,7 +668,6 @@ INCLUDE "audio/music/defeatedtrainer.asm"
 INCLUDE "audio/music/defeatedwildmon.asm"
 INCLUDE "audio/music/defeatedgymleader.asm"
 
-
 SECTION "Music 3", ROMX, BANK[AUDIO_3]
 
 INCLUDE "audio/music/bikeriding.asm"
@@ -670,4 +692,10 @@ INCLUDE "audio/music/surfing.asm"
 INCLUDE "audio/music/jigglypuffsong.asm"
 INCLUDE "audio/music/halloffame.asm"
 INCLUDE "audio/music/credits.asm"
+
+;NUEVO PARA NUEVAS MUSICAS
+SECTION "Music 4", ROMX, BANK[AUDIO_4]
+
+INCLUDE "audio/music/heartmulholland.asm"
+;NUEVO PARA NUEVAS MUSICAS
 

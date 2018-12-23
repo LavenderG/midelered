@@ -61,7 +61,7 @@ ItemUsePtrTable:
 	dw UnusableItem      ; SECRET_KEY
 	dw UnusableItem
 	dw UnusableItem      ; BIKE_VOUCHER
-	dw ItemUseXAccuracy  ; X_ACCURACY
+	dw UnusableItem  ; X_ACCURACY
 	dw ItemUseEvoStone   ; LEAF_STONE
 	dw ItemUseCardKey    ; CARD_KEY
 	dw UnusableItem      ; NUGGET
@@ -70,20 +70,20 @@ ItemUsePtrTable:
 	dw ItemUseMedicine   ; FULL_HEAL
 	dw ItemUseMedicine   ; REVIVE
 	dw ItemUseMedicine   ; MAX_REVIVE
-	dw ItemUseGuardSpec  ; GUARD_SPEC
+	dw UnusableItem  ; GUARD_SPEC
 	dw ItemUseSuperRepel ; SUPER_REPL
 	dw ItemUseMaxRepel   ; MAX_REPEL
-	dw ItemUseDireHit    ; DIRE_HIT
+	dw UnusableItem   ; DIRE_HIT
 	dw UnusableItem      ; COIN
 	dw ItemUseMedicine   ; FRESH_WATER
 	dw ItemUseMedicine   ; SODA_POP
 	dw ItemUseMedicine   ; LEMONADE
 	dw UnusableItem      ; S_S_TICKET
 	dw UnusableItem      ; GOLD_TEETH
-	dw ItemUseXStat      ; X_ATTACK
-	dw ItemUseXStat      ; X_DEFEND
-	dw ItemUseXStat      ; X_SPEED
-	dw ItemUseXStat      ; X_SPECIAL
+	dw UnusableItem      ; X_ATTACK
+	dw UnusableItem      ; X_DEFEND
+	dw UnusableItem      ; X_SPEED
+	dw UnusableItem      ; X_SPECIAL
 	dw ItemUseCoinCase   ; COIN_CASE
 	dw ItemUseOaksParcel ; OAKS_PARCEL
 	dw ItemUseItemfinder ; ITEMFINDER
@@ -805,6 +805,9 @@ ItemUseMedicine:
 	ld a, [wPartyCount]
 	and a
 	jp z, .emptyParty
+	ld a, [wIsInBattle]  ; NUEVO PARA QUE LOS OBJETOS CURACION NO SE PODRAN USAR EN BATALLA
+	and a ; ; NUEVO PARA QUE LOS OBJETOS CURACION NO SE PODRAN USAR EN BATALLA
+	jp nz, ItemUseNotTime ; ; NUEVO PARA QUE LOS OBJETOS CURACION NO SE PODRAN USAR EN BATALLA
 	ld a, [wWhichPokemon]
 	push af
 	ld a, [wcf91]
@@ -852,7 +855,7 @@ ItemUseMedicine:
 ; if using softboiled
 	ld a, [wWhichPokemon]
 	cp d ; is the pokemon trying to use softboiled on itself?
-	jr z, ItemUseMedicine ; if so, force another choice
+	jp z, ItemUseMedicine ; if so, force another choice  ; NUEVO, ANTES jr z PARA QUE LOS OBJETOS CURACION NO SE PODRAN USAR EN BATALLA
 .checkItemType
 	ld a, [wcf91]
 	cp REVIVE
@@ -1279,12 +1282,22 @@ ItemUseMedicine:
 	jr nc, .noCarry2
 	inc h
 .noCarry2
-	ld a, [hli]
+; NUEVO PARA VITAMINAS SUBIDA AL MAXIMO
+    ld a, [hli]
+	;ld a, 10
+; NUEVO PARA VITAMINAS SUBIDA AL MAXIMO
 	ld b, a
+; NUEVO PARA VITAMINAS SUBIDA AL MAXIMO
+	;ld a, [hl] ; a = MSB of stat experience of the appropriate stat
+	;cp 100 ; is there already at least 25600 (256 * 100) stat experience?
+	;jr nc, .vitaminNoEffect ; if so, vitamins can't add any more
+	;add b ; add 2560 (256 * 10) stat experience
+	;jr nc, .noCarry3 ; a carry should be impossible here, so this will always jump
+	;ld a, 255
+;.noCarry3
 	ld a, [hl]
 	ld c, a
 	ld a, b
-
 	; If the most significant byte is maxed out, check least significant byte
 	cp $ff
 	jr z, .check_lsb
@@ -1312,6 +1325,7 @@ ItemUseMedicine:
 	ld a, b
 	ld [hli], a
 	ld a, c
+; NUEVO PARA VITAMINAS SUBIDA AL MAXIMO	
 	ld [hl], a
 	pop hl
 	call .recalculateStats
@@ -1359,11 +1373,13 @@ ItemUseMedicine:
 	ld a, [hl] ; a = level
 	cp MAX_LEVEL
 	jr z, .vitaminNoEffect ; can't raise level above 100
+	; NUEVO PARA LEVEL CAP 
 	; check badge level cap
 	call GetBadgeLevel
 	ld a, [hl]
 	cp b
 	jr nc, .vitaminNoEffect
+	; NUEVO PARA LEVEL CAP
 	inc a
 	ld [hl], a ; store incremented level
 	ld [wCurEnemyLVL], a
@@ -2026,6 +2042,11 @@ ItemUsePPUp:
 	jp nz, ItemUseNotTime
 
 ItemUsePPRestore:
+    ; NUEVO PARA QUE NO SE PUEDAN USAR OBJETOS EN BATALLA
+	ld a, [wIsInBattle]
+    and a
+    jp nz, ItemUseNotTime
+	; NUEVO PARA QUE NO SE PUEDAN USAR OBJETOS EN BATALLA
 	ld a, [wWhichPokemon]
 	push af
 	ld a, [wcf91]
@@ -2317,10 +2338,12 @@ ItemUseTMHM:
 	ld a, b
 	and a
 	ret z
+	; NUEVO, QUITANDO ESTO HAY MT INFINITAS, NO ESTOY SEGURO TIENE QUE SER ASI ESTA ULTIMAS 4 LINEAS
 	ld a, [wcf91]
 	call IsItemHM
-	ret c
-	jp RemoveUsedItem
+	ret
+	;jp RemoveUsedItem
+	; NUEVO PARA MT INFINITAS
 
 BootedUpTMText:
 	TX_FAR _BootedUpTMText

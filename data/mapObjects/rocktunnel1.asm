@@ -12,9 +12,9 @@ RockTunnel1Object:
 	warp 37, 17, 3, ROCK_TUNNEL_2
 
 	db 1 ; signs
-	sign 11, 29, 8 ; RockTunnel1Text8
+	sign 11, 29, 9 ; RockTunnel1Text8
 
-	db 7 ; objects
+	db 8 ; objects
 	object SPRITE_HIKER, 7, 5, STAY, DOWN, 1, OPP_HIKER, 12
 	object SPRITE_HIKER, 5, 16, STAY, DOWN, 2, OPP_HIKER, 13
 	object SPRITE_HIKER, 17, 15, STAY, LEFT, 3, OPP_HIKER, 14
@@ -22,6 +22,7 @@ RockTunnel1Object:
 	object SPRITE_LASS, 37, 21, STAY, LEFT, 5, OPP_JR_TRAINER_F, 17
 	object SPRITE_LASS, 22, 24, STAY, DOWN, 6, OPP_JR_TRAINER_F, 18
 	object SPRITE_LASS, 32, 24, STAY, RIGHT, 7, OPP_JR_TRAINER_F, 19
+	object SPRITE_LASS, 10, 10, STAY, RIGHT, 8, OPP_MANEC, 1 ; NUEVO
 
 	; warp-to
 	warp_to 15, 3, ROCK_TUNNEL_1_WIDTH

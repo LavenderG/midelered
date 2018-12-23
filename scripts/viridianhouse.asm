@@ -8,11 +8,13 @@ ViridianHouseTextPointers:
 	dw ViridianHouseText4
 
 ViridianHouseText1:
-	TX_FAR _ViridianHouseText1
+	;TX_FAR _ViridianHouseText1
+	TX_FAR MoveDeleterText1
 	db "@"
 
 ViridianHouseText2:
-	TX_FAR _ViridianHouseText2
+	;TX_FAR _ViridianHouseText2
+	TX_FAR MoveRelearnerText1
 	db "@"
 
 ViridianHouseText3:

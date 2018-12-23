@@ -151,4 +151,4 @@ PredefPointers::
 	add_predef DrawHP2
 	add_predef DisplayElevatorFloorMenu
 	add_predef OaksAideScript
-	add_predef StatusScreen3
+	add_predef StatusScreen3 ; NUEVO TERCERA VENTANA DE STATS

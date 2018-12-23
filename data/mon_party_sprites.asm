@@ -74,4 +74,46 @@ MonPartyData:
 	dn SPRITE_BIRD_M, SPRITE_BIRD_M         ;Zapdos/Moltres
 	dn SPRITE_SNAKE, SPRITE_SNAKE           ;Dratini/Dragonair
 	dn SPRITE_SNAKE, SPRITE_MON             ;Dragonite/Mewtwo
-	dn SPRITE_MON, 0                        ;Mew/Padding
+	dn SPRITE_MON, SPRITE_BALL_M            ;Mew/Nosepass
+	dn SPRITE_BALL_M, SPRITE_FAIRY			;Probopass/Mimikyu
+	dn SPRITE_FAIRY, SPRITE_FAIRY		    ;Togepi/Togetic
+	dn SPRITE_MON, SPRITE_MON		        ;Yamask/Cofagrigus
+	dn SPRITE_GRASS, SPRITE_GRASS		    ;Fomantis/Lurantis
+    dn SPRITE_BIRD_M, SPRITE_BIRD_M		    ;Rowlet/Dartrix
+	dn SPRITE_BIRD_M, SPRITE_MON	        ;Decidueye/Litwick
+	dn SPRITE_MON, SPRITE_MON	            ;Lampent/Chandelure
+	dn SPRITE_MON, SPRITE_MON		        ;Mudkip/Marshtomp
+	dn SPRITE_MON, SPRITE_BIRD_M            ;Swampert/Swablu
+	dn SPRITE_BIRD_M, SPRITE_BUG            ;Altaria/Grubbin
+	dn SPRITE_BUG, SPRITE_BUG               ;Charjabug/Vikavolt
+	dn SPRITE_MON, SPRITE_MON              ;Sneasel/Smeargle
+	dn SPRITE_MON, SPRITE_MON               ;Micomon/Crobat
+	dn SPRITE_BUG, SPRITE_BUG               ;Scizor/Trapinch
+	dn SPRITE_SNAKE, SPRITE_SNAKE               ;Vibrava/Flygon
+	dn SPRITE_MON, SPRITE_MON           ;Sandile/Krokorok
+	dn SPRITE_MON, SPRITE_FAIRY            ;Krookodile/Solosis
+	dn SPRITE_FAIRY, SPRITE_FAIRY              ;Duosion/Reuniclus
+	dn SPRITE_BUG, SPRITE_MON              ;Catermano/Lucario
+	dn SPRITE_MON, SPRITE_MON            ;Timburr/Gurdurr
+	dn SPRITE_MON, SPRITE_MON              ;Conkeldurr/Tyranitar
+	dn SPRITE_SNAKE, SPRITE_BALL_M         ;Steelix/Beldum
+    dn SPRITE_BALL_M, SPRITE_BALL_M           ;Metang/Metagross
+	dn SPRITE_FAIRY, SPRITE_MON                    ;Dark Pika/Zoroark
+	dn SPRITE_SNAKE, SPRITE_MON          ;Drampa/Weavile
+	dn SPRITE_MON, SPRITE_MON                    ;Drillbur/Excadrill
+	dn SPRITE_SNAKE, SPRITE_SNAKE          ;Tynamo/Eelektrik
+	dn SPRITE_SNAKE, SPRITE_MON            ;Eelektross/Snover
+	dn SPRITE_MON, SPRITE_FAIRY            ;Abomasnow/TOGEKISS
+	dn SPRITE_BUG, SPRITE_QUADRUPED        ;HERACROSS/ESPEON
+	dn SPRITE_QUADRUPED, SPRITE_QUADRUPED   ;UMBREON/leafeon
+	dn SPRITE_QUADRUPED, SPRITE_QUADRUPED       ;GLACEON/Houndour
+	dn SPRITE_QUADRUPED, SPRITE_WATER   ;HOUNDOOM/CHINCHOU
+	dn SPRITE_WATER, SPRITE_BIRD_M      ;LANTURN/MURKROW
+	dn SPRITE_BIRD_M, SPRITE_QUADRUPED  ;HONCHROW/NUMEL
+	dn SPRITE_QUADRUPED, SPRITE_MON    ;CAMERUPT/RHYPERIOR
+	dn SPRITE_SNAKE, SPRITE_BIRD_M  ;KINGDRA/SKARMORY
+	dn SPRITE_SNAKE, SPRITE_BALL_M   ;SALAMENCE/MAGNEZONE
+	dn SPRITE_GRASS, SPRITE_MON  ;TANGROWTH/ELECTIVIRE
+	dn SPRITE_MON, SPRITE_MON   ;MAGMORTAR/LICKILICKI
+	dn SPRITE_BALL_M, SPRITE_BALL_M   ;PORYGON2/PORYGONZ
+	

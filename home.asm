@@ -552,6 +552,7 @@ GetwMoves::
 ; copies the base stat data of a pokemon to wMonHeader
 ; INPUT:
 ; [wd0b5] = pokemon ID
+; [wd0b5] = 2-byte pokemon ID    AHORA ES ESTO, NO EL DE ARRIBA
 GetMonHeader::
 	ld a, [H_LOADEDROMBANK]
 	push af
@@ -570,7 +571,7 @@ GetMonHeader::
 	cp FOSSIL_KABUTOPS ; Kabutops fossil
 	jr z, .specialID
 	ld de, GhostPic
-	cp MON_GHOST ; Ghost
+    cp MON_GHOST ; Ghost
 	jr z, .specialID
 	ld de, FossilAerodactylPic
 	ld b, $77 ; size of Aerodactyl fossil sprite
@@ -730,32 +731,49 @@ UncompressMonSprite::
 ; $4A ≤ index < $74, bank $B
 ; $74 ≤ index < $99, bank $C
 ; $99 ≤ index,       bank $D
-	ld a, [wcf91] ; XXX name for this ram location
-	ld b, a
-	cp MEW
-	ld a, BANK(MewPicFront)
-	jr z, .GotBank
-	ld a, b
+ ; NUEVO PARA SPRITES BORRADO LOS DE ABAJO
+	;;ld a, [wcf91] ; XXX name for this ram location
+	;;ld b, a
+	;;cp MEW
+	;;ld a, BANK(MewPicFront)
+	;,jr z, .GotBank
+	;,ld a, b
+	;;cp FOSSIL_KABUTOPS
+	;;ld a, BANK(FossilKabutopsPic)
+	;;jr z, .GotBank
+	;;ld a, b
+	;;cp TANGELA + 1
+	;;ld a, BANK(TangelaPicFront)
+	;;jr c, .GotBank
+	;;ld a, b
+	;cp MOLTRES + 1
+	;ld a, BANK(MoltresPicFront)
+	;jr c, .GotBank
+	;ld a, b
+	;cp BEEDRILL + 2
+	;ld a, BANK(BeedrillPicFront)
+	;jr c, .GotBank
+	;ld a, b
+	;cp STARMIE + 1
+	;ld a, BANK(StarmiePicFront)
+	;jr c, .GotBank
+	;ld a, BANK(VictreebelPicFront)
+	; HAX: code from Danny-E33's hack
+	; Each pokemon's picture bank is defined with an unused byte in its stats.
+	ld a, [wcf91] ; get Pokémon ID
+	ld b, BANK(FossilKabutopsPic)
 	cp FOSSIL_KABUTOPS
-	ld a, BANK(FossilKabutopsPic)
-	jr z, .GotBank
-	ld a, b
-	cp TANGELA + 1
-	ld a, BANK(TangelaPicFront)
-	jr c, .GotBank
-	ld a, b
-	cp MOLTRES + 1
-	ld a, BANK(MoltresPicFront)
-	jr c, .GotBank
-	ld a, b
-	cp BEEDRILL + 2
-	ld a, BANK(BeedrillPicFront)
-	jr c, .GotBank
-	ld a, b
-	cp STARMIE + 1
-	ld a, BANK(StarmiePicFront)
-	jr c, .GotBank
-	ld a, BANK(VictreebelPicFront)
+	jr z,.RecallBank
+	ld b, BANK(FossilAerodactylPic)
+	cp FOSSIL_AERODACTYL
+	jr z,.RecallBank
+	cp MON_GHOST
+	jr z,.RecallBank
+	ld a, [wMonHPicBank] ; Get bank from base stats
+	jr .GotBank
+.RecallBank
+	ld a,b
+ ; NUEVO PARA SPRITES	
 .GotBank
 	jp UncompressSpriteData
 
@@ -1452,7 +1470,10 @@ DisplayListMenuIDLoop::
 	call PlaceMenuCursor
 	pop af
 	bit 0, a ; was the A button pressed?
-	jp z, .checkOtherKeys
+	; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+	;jp z, .checkOtherKeys
+	jp z, checkOtherKeys
+	; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
 .buttonAPressed
 	ld a, [wCurrentMenuItem]
 	call PlaceUnfilledArrowMenuCursor
@@ -1494,11 +1515,18 @@ DisplayListMenuIDLoop::
 	ld [wcf91], a
 	ld a, [wListMenuID]
 	and a ; is it a PC pokemon list?
-	jr z, .pokemonList
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+	;jr z, .pokemonList
+	jr z, pokemonList
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
 	push hl
 	call GetItemPrice
 	pop hl
-	ld a, [wListMenuID]
+	; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+	;ld a, [wListMenuID]
+	jp DisplayListMenuIDLoop_Hack
+checkIfItemListMenu:
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
 	cp ITEMLISTMENU
 	jr nz, .skipGettingQuantity
 ; if it's an item menu
@@ -1511,8 +1539,12 @@ DisplayListMenuIDLoop::
 	ld a, BANK(ItemNames)
 	ld [wPredefBank], a
 	call GetName
-	jr .storeChosenEntry
-.pokemonList
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+;	jr .storeChosenEntry
+;.pokemonList
+    jr storeChosenEntry
+pokemonList:
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
 	ld hl, wPartyCount
 	ld a, [wListPointer]
 	cp l ; is it a list of party pokemon or box pokemon?
@@ -1522,9 +1554,19 @@ DisplayListMenuIDLoop::
 .getPokemonName
 	ld a, [wWhichPokemon]
 	call GetPartyMonName
-.storeChosenEntry ; store the menu entry that the player chose and return
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+;.storeChosenEntry ; store the menu entry that the player chose and return
+storeChosenEntry: ; store the menu entry that the player chose and return
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+; NUEVO HACK PARA EVITAR QUE OCURRA BUG DE MT CUELGUE DEL JUEGO Y DESAPARICION DE MUÑECO, ESTE CUELGE PASA CON EL FIX DE CORREGIR 196 POKEMON EN MT AÑADIDO EN getname: 
+; hacky way to stop TMs crashing for now
+	ld a, $50 ; "@"
+	ld [wTileMapBackup2 - 1], a ; make sure the string at wcd6d is always terminated so it can't crash
+	; original script follows
+; NUEVO HACK PARA EVITAR QUE OCURRA BUG DE MT CUELGUE DEL JUEGO Y DESAPARICION DE MUÑECO, ESTE CUELGE PASA CON EL FIX DE CORREGIR 196 POKEMON EN MT AÑADIDO EN getname: 
 	ld de, wcd6d
 	call CopyStringToCF4B ; copy name to wcf4b
+skipStoringItemName:
 	ld a, CHOSE_MENU_ITEM
 	ld [wMenuExitMethod], a
 	ld a, [wCurrentMenuItem]
@@ -1534,7 +1576,10 @@ DisplayListMenuIDLoop::
 	ld hl, wd730
 	res 6, [hl] ; turn on letter printing delay
 	jp BankswitchBack
-.checkOtherKeys ; check B, SELECT, Up, and Down keys
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+;.checkOtherKeys ; check B, SELECT, Up, and Down keys
+checkOtherKeys: ; check B, SELECT, Up, and Down keys
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
 	bit 1, a ; was the B button pressed?
 	jp nz, ExitListMenu ; if so, exit the menu
 	bit 2, a ; was the select button pressed?
@@ -2581,14 +2626,22 @@ TrainerEndBattleText::
 ; only engage withe trainer if the player is not already
 ; engaged with another trainer
 ; XXX unused?
-CheckIfAlreadyEngaged::
-	ld a, [wFlags_0xcd60]
-	bit 0, a
-	ret nz
-	call EngageMapTrainer
-	xor a
-	ret
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+;CheckIfAlreadyEngaged::
+;	ld a, [wFlags_0xcd60]
+;	bit 0, a
+;	ret nz
+;	call EngageMapTrainer
+;	xor a
+;	ret
 
+DisplayListMenuIDLoop_Hack:
+	ld a,[wListMenuID]
+	cp a, MOVESLISTMENU
+	jp z, skipStoringItemName
+	jp checkIfItemListMenu
+; NUEVO PARA ARREGLAR MOVE DELETER Y RELEARNER
+	
 PlayTrainerMusic::
 	ld a, [wEngagedTrainerClass]
 	cp OPP_SONY1
@@ -3114,22 +3167,36 @@ LoadTextBoxTilePatterns::
 	lb bc, BANK(TextBoxGraphics), (TextBoxGraphicsEnd - TextBoxGraphics) / $10
 	jp CopyVideoData ; if LCD is on, transfer during V-blank
 
-LoadHpBarAndStatusTilePatterns::
-	ld a, [rLCDC]
-	bit 7, a ; is the LCD enabled?
-	jr nz, .on
-.off
-	ld hl, HpBarAndStatusGraphics
-	ld de, vChars2 + $620
-	ld bc, HpBarAndStatusGraphicsEnd - HpBarAndStatusGraphics
-	ld a, BANK(HpBarAndStatusGraphics)
-	jp FarCopyData2 ; if LCD is off, transfer all at once
-.on
-	ld de, HpBarAndStatusGraphics
-	ld hl, vChars2 + $620
-	lb bc, BANK(HpBarAndStatusGraphics), (HpBarAndStatusGraphicsEnd - HpBarAndStatusGraphics) / $10
-	jp CopyVideoData ; if LCD is on, transfer during V-blank
-
+; NUEVO PARA BATTLE EXP
+;LoadHpBarAndStatusTilePatterns::
+;	ld a, [rLCDC]
+;	bit 7, a ; is the LCD enabled?
+;	jr nz, .on
+;.off
+;	ld hl, HpBarAndStatusGraphics
+;	ld de, vChars2 + $620
+;	ld bc, HpBarAndStatusGraphicsEnd - HpBarAndStatusGraphics
+;	ld a, BANK(HpBarAndStatusGraphics)
+;	jp FarCopyData2 ; if LCD is off, transfer all at once
+;.on
+;	ld de, HpBarAndStatusGraphics
+;	ld hl, vChars2 + $620
+;	lb bc, BANK(HpBarAndStatusGraphics), (HpBarAndStatusGraphicsEnd - HpBarAndStatusGraphics) / $10
+;	jp CopyVideoData ; if LCD is on, transfer during V-blank
+LoadHpBarAndStatusTilePatterns::	
+	ld de,HpBarAndStatusGraphics
+	ld hl,vChars2 + $620
+	lb bc,BANK(HpBarAndStatusGraphics), (HpBarAndStatusGraphicsEnd - HpBarAndStatusGraphics) / $10
+	call GoodCopyVideoData
+	ld de,EXPBarGraphics
+	ld hl,vChars1 + $400
+	; NUEVO PARA SHINY
+	;lb bc,BANK(EXPBarGraphics), (EXPBarGraphicsEnd - EXPBarGraphics) / $10
+	lb bc, BANK(EXPBarGraphics), (EXPBarShinySparkleGraphicsEnd - EXPBarGraphics) / $10
+	; NUEVO PARA SHINY
+	jp GoodCopyVideoData
+	ds $8
+; NUEVO PARA BATTLE EXP
 
 FillMemory::
 ; Fill bc bytes at hl with a.
@@ -3242,13 +3309,23 @@ GetName::
 ; [wPredefBank] = bank of list
 ;
 ; returns pointer to name in de
+	; NUEVO FIX PARA CORREGIR 196 POKEMON EVOLUCIONA EN HM01 ETC.
+	ld a,[wNameListType]
+    cp ITEM_NAME
+	; NUEVO FIX PARA CORREGIR 196 POKEMON EVOLUCIONA EN HM01 ETC.
 	ld a, [wd0b5]
 	ld [wd11e], a
+	; NUEVO FIX PARA CORREGIR 196 POKEMON EVOLUCIONA EN HM01 ETC.
+	jr nz, .noItem
+	; NUEVO FIX PARA CORREGIR 196 POKEMON EVOLUCIONA EN HM01 ETC.
 
 	; TM names are separate from item names.
 	; BUG: This applies to all names instead of just items.
 	cp HM_01
 	jp nc, GetMachineName
+	; NUEVO FIX PARA CORREGIR 196 POKEMON EVOLUCIONA EN HM01 ETC.
+.noItem          ; Return here if not an item
+	; NUEVO FIX PARA CORREGIR 196 POKEMON EVOLUCIONA EN HM01 ETC.
 
 	ld a, [H_LOADEDROMBANK]
 	push af
@@ -4579,7 +4656,7 @@ Random::
 	pop hl
 	ret
 
-INCLUDE "home/badge_cap.asm"
+INCLUDE "home/badge_cap.asm" ; NUEVO PARA LEVEL CAP
 
 INCLUDE "home/predef.asm"
 
@@ -4720,3 +4797,24 @@ const_value = 1
 	add_tx_pre BookOrSculptureText                  ; 40
 	add_tx_pre ElevatorText                         ; 41
 	add_tx_pre PokemonStuffText                     ; 42
+
+; NUEVO PARA BATTLE EXP
+GoodCopyVideoData:
+	ld a,[rLCDC]
+	bit 7,a ; is the LCD enabled?
+	jp nz, CopyVideoData ; if LCD is on, transfer during V-blank
+	ld a, b
+	push hl
+	push de
+	ld h, 0
+	ld l, c
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	ld b, h
+	ld c, l
+	pop hl
+	pop de
+	jp FarCopyData2 ; if LCD is off, transfer all at once 
+; NUEVO PARA BATTLE EXP

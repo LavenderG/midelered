@@ -164,8 +164,21 @@ const_value = 1
 	const SUPER_FANG   ; a2
 	const SLASH        ; a3
 	const SUBSTITUTE   ; a4
-	const MIDELE_POWER ; a5
-	const DARK_THUNDER ; a6
+	const DRAGONBREATH
+	const SHADOW_BALL
+	const SLUDGE_BOMB
+	const CRUNCH
+	const NIGHT_SLASH
+	const IRON_HEAD
+	const STEEL_WING
+	const OUTRAGE
+	const GIGA_DRAIN
+	const MIDELE_POWER 
+	const DARK_THUNDER
+	const SKETCH
+	const X_SCISSOR
+	const MEGAHORN
+	const BRICK_BREAK 
 
 NUM_ATTACKS EQU const_value + -1
 

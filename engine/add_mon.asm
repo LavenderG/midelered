@@ -75,7 +75,7 @@ _AddPartyMon:
 	push hl
 	ld a, [wMonDataLocation]
 	and $f
-	ld a, $FF     ; set enemy trainer mon IVs to fixed average values
+    ld a, $FF     ; set enemy trainer mon IVs to fixed average values
 	ld b, $FF
 	jr nz, .next4
 
@@ -214,7 +214,8 @@ _AddPartyMon:
 	ld [de], a
 	xor a
 	ld b, NUM_STATS * 2
-	; write $FF to all stat experience values
+; NUEVO PARA ENTRENADORES MAX EVS
+; write $FF to all stat experience values
 	; if the mon is the enemy in a trainer battle
 	ld a, [wMonDataLocation]
 	and $f
@@ -223,6 +224,7 @@ _AddPartyMon:
 	dec a
 	jr z, .writeEVsLoop
 	ld a, $FF
+; NUEVO PARA ENTRENADORES MAX EVS
 .writeEVsLoop              ; set all EVs to 0
 	inc de
 	ld [de], a
@@ -246,11 +248,15 @@ _AddPartyMon:
 	jr .done
 .calcFreshStats
 	pop hl
-	push hl
+	push hl ; NUEVO PARA ENTRENADORES MAX EVS
 	ld bc, wPartyMon1HPExp - 1 - wPartyMon1
 	add hl, bc
+	; NUEVO PARA ENTRENADORES MAX EVS
+	;ld b, $0
 	ld b, $1               ; use stat experience in calculation
+	; NUEVO PARA ENTRENADORES MAX EVS
 	call CalcStats         ; calculate fresh set of stats
+	; NUEVO PARA ENTRENADORES MAX EVS
 	; update enemy mon current hp in enemy trainer battle
 	pop hl
 	ld a, [wMonDataLocation]
@@ -274,6 +280,8 @@ _AddPartyMon:
 	ld [hli], a
 	ld a, [wBuffer + 1]
 	ld [hl], a
+	; NUEVO PARA ENTRENADORES MAX EVS
+	
 .done
 	scf
 	ret

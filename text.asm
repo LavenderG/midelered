@@ -13,6 +13,7 @@ TEXT_10 EQU TEXT_9 + 1
 TEXT_11 EQU TEXT_10 + 1
 
 POKEDEX_TEXT EQU TEXT_11 + 1
+POKEDEX_TEXT_2 EQU $32
 MOVE_NAMES   EQU POKEDEX_TEXT + 1
 
 INCLUDE "macros.asm"
@@ -228,6 +229,9 @@ SECTION "Text 3", ROMX, BANK[TEXT_3]
 
 INCLUDE "text/maps/rock_tunnel_b2f_2.asm"
 INCLUDE "text/maps/seafoam_islands_b4f.asm"
+INCLUDE "text/maps/unknown_dungeon1.asm"  ; NUEVO
+INCLUDE "text/maps/move_relearner.asm" ; NUEVO RELEARNER
+INCLUDE "text/maps/move_deleter.asm" ; NUEVO DELETER
 
 _AIBattleWithdrawText::
 	TX_RAM wTrainerName
@@ -2292,6 +2296,16 @@ _TransformedText::
 	text "!"
 	prompt
 
+; NUEVO PARA SKETCH
+_SketchedText::
+	text "<USER>"
+	line "SKETCHED "
+	cont "@"
+	TX_RAM wcd6d
+	text "!"
+	prompt
+; NUEVO PARA SKETCH
+
 _LightScreenProtectedText::
 	text "<USER>'s"
 	line "protected against"
@@ -3195,6 +3209,10 @@ _UsedCutText::
 SECTION "Pokedex Text", ROMX, BANK[POKEDEX_TEXT]
 
 INCLUDE "text/pokedex.asm"
+
+SECTION "Pokedex Text 2", ROMX, BANK[POKEDEX_TEXT_2]
+
+INCLUDE "text/pokedex2.asm"
 
 
 SECTION "Move Names", ROMX, BANK[MOVE_NAMES]

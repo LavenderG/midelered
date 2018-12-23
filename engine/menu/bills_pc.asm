@@ -445,7 +445,7 @@ DisplayDepositWithdrawMenu:
 	ld [wMonDataLocation], a
 	predef StatusScreen
 	predef StatusScreen2
-	predef StatusScreen3
+	predef StatusScreen3 ; NUEVO TERCERA PANTALLA DE STATS
 	call LoadScreenTilesFromBuffer1
 	call ReloadTilesetTilePatterns
 	call RunDefaultPaletteCommand
@@ -552,3 +552,4 @@ JustAMomentText::
 
 OpenBillsPCText::
 	db $FD ; FuncTX_BillsPC
+

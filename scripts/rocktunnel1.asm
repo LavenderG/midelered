@@ -20,6 +20,7 @@ RockTunnel1TextPointers:
 	dw RockTunnel1Text5
 	dw RockTunnel1Text6
 	dw RockTunnel1Text7
+	dw RockTunnel1Text9 ; NUEVO
 	dw RockTunnel1Text8
 
 RockTunnel1TrainerHeader0:
@@ -84,7 +85,16 @@ RockTunnel1TrainerHeader6:
 	dw RockTunnel1AfterBattleText7 ; TextAfterBattle
 	dw RockTunnel1EndBattleText7 ; TextEndBattle
 	dw RockTunnel1EndBattleText7 ; TextEndBattle
-
+; NUEVO
+RockTunnel1TrainerHeader7:
+	dbEventFlagBit EVENT_BEAT_ROCK_TUNNEL_1_TRAINER_6
+	db ($4 << 4) ; trainer's view range
+	dwEventFlagAddress EVENT_BEAT_ROCK_TUNNEL_1_TRAINER_6
+	dw RockTunnel1BattleText8 ; TextBeforeBattle
+	dw RockTunnel1AfterBattleText8 ; TextAfterBattle
+	dw RockTunnel1EndBattleText8 ; TextEndBattle
+	dw RockTunnel1EndBattleText8 ; TextEndBattle
+; NUEVO
 	db $ff
 
 RockTunnel1Text1:
@@ -123,6 +133,13 @@ RockTunnel1Text7:
 RockTunnel1TalkToTrainer:
 	call TalkToTrainer
 	jp TextScriptEnd
+
+; NUEVO
+RockTunnel1Text9:
+	TX_ASM
+	ld hl, RockTunnel1TrainerHeader7
+	jr RockTunnel1TalkToTrainer
+; NUEVO
 
 RockTunnel1BattleText1:
 	TX_FAR _RockTunnel1BattleText1
@@ -211,3 +228,17 @@ RockTunnel1AfterBattleText7:
 RockTunnel1Text8:
 	TX_FAR _RockTunnel1Text8
 	db "@"
+
+; NUEVO
+RockTunnel1BattleText8:
+	TX_FAR _RockTunnel1BattleText8
+	db "@"
+
+RockTunnel1EndBattleText8:
+	TX_FAR _RockTunnel1EndBattleText8
+	db "@"
+
+RockTunnel1AfterBattleText8:
+	TX_FAR _RockTunnel1AfterBattleText8
+	db "@"
+; NUEVO

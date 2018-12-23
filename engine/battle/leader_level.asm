@@ -1,4 +1,3 @@
-
 ; Gets player's party max level
 ; Returns: the player's plarty max level in a
 GetPlayerPartyMaxLevel:
@@ -9,7 +8,6 @@ GetPlayerPartyMaxLevel:
 	ld d, a
 	ld e, 0 ; max value
 	ld hl, wPartyMon1Level ; current party mon level location
-
 .max_level_loop
 	; get the level of the current party mon
 	; and update e if the level is greater than the max
@@ -26,14 +24,12 @@ GetPlayerPartyMaxLevel:
 	ld a, d
 	and a
 	jr nz, .max_level_loop
-
 	; store result in a and return from call
 	ld a, e
 	pop hl
 	pop de
 	pop bc
 	ret
-
 ; Gets a given leader level based on its minimum level
 ; and the player's party max level
 ; Parameters:
