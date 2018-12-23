@@ -33,8 +33,8 @@ GainExperience:
 	; if level is 100, continue normally
 	jr z, .gain_stat_exp
 	cp b
-	; if level is >= level cap, done
-	jp nc, .done
+	; if level is >= level cap, go to next mon
+	jp nc, .nextMon
 .gain_stat_exp
 ; NUEVO PARA LEVEL CAP
 	ld de, (wPartyMon1HPExp + 1) - (wPartyMon1HP + 1)
@@ -175,7 +175,7 @@ GainExperience:
 	callba CalcLevelFromExperience
 	pop hl
 	ld a, [hl] ; current level
-	ld [wTempLevel], a ; store current level   ; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+	ld [wTempLevel], a ; store current level   ; NUEVO PARA CORREGIR Do not skip moves if you skipped that level
 	cp d
 	jp z, .nextMon ; if level didn't change, go to next mon
 	call KeepEXPBarFull ; NUEVO PARA BATTLE EXP
@@ -274,7 +274,7 @@ GainExperience:
 	ld a, [wd0b5]
 	ld [wd11e], a
 
-	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level
 	ld a, [wCurEnemyLVL]
 	ld c, a
 	ld a, [wTempLevel]
@@ -284,15 +284,15 @@ GainExperience:
 	ld a, b
 	ld [wCurEnemyLVL], a
 	push bc
-	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level
 
 	predef LearnMoveFromLevelUp
-	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level
 	pop bc
 	ld a, b
 	cp c
 	jr nz, .level_loop
-	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level 
+	; NUEVO PARA CORREGIR Do not skip moves if you skipped that level
 
 	ld hl, wCanEvolveFlags
 	ld a, [wWhichPokemon]
