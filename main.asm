@@ -129,6 +129,7 @@ INCLUDE "engine/get_bag_item_quantity.asm"
 INCLUDE "engine/pathfinding.asm"
 INCLUDE "engine/hp_bar.asm"
 INCLUDE "engine/hidden_object_functions3.asm"
+INCLUDE "engine/badge_stat_exp.asm"
 
 SECTION "NPC Sprites 1", ROMX, BANK[NPC_SPRITES_1]
 
@@ -1292,7 +1293,7 @@ SECTION "bank13",ROMX,BANK[$13]
 
 TrainerPics::
 YoungsterPic::     INCBIN "pic/trainer/youngster.pic"
-BugCatcherPic::    
+BugCatcherPic::
 UtalaweaPic::      INCBIN "pic/trainer/bugcatcher.pic"
 LassPic::          INCBIN "pic/trainer/lass.pic"
 SailorPic::        INCBIN "pic/trainer/sailor.pic"
@@ -1300,7 +1301,7 @@ JrTrainerMPic::    INCBIN "pic/trainer/jr.trainerm.pic"
 JrTrainerFPic::    INCBIN "pic/trainer/jr.trainerf.pic"
 PokemaniacPic::    INCBIN "pic/trainer/pokemaniac.pic"
 SuperNerdPic::
-DarkiPic::   
+DarkiPic::
 GoldyPic::         INCBIN "pic/trainer/supernerd.pic"
 HikerPic::         INCBIN "pic/trainer/hiker.pic"
 BikerPic::         INCBIN "pic/trainer/biker.pic"
@@ -1308,7 +1309,7 @@ BurglarPic::       INCBIN "pic/trainer/burglar.pic"
 EngineerPic::      INCBIN "pic/trainer/engineer.pic"
 FisherPic::        INCBIN "pic/trainer/fisher.pic"
 SwimmerPic::       INCBIN "pic/trainer/swimmer.pic"
-CueBallPic::  
+CueBallPic::
 JavisitPic::       INCBIN "pic/trainer/cueball.pic"
 GamblerPic::       INCBIN "pic/trainer/gambler.pic"
 BeautyPic::        INCBIN "pic/trainer/beauty.pic"
@@ -1325,7 +1326,7 @@ ScientistPic::
 ManecPic::         INCBIN "pic/trainer/scientist.pic"
 GiovanniPic::      INCBIN "pic/trainer/giovanni.pic"
 RocketPic::        INCBIN "pic/trainer/rocket.pic"
-CooltrainerMPic::  
+CooltrainerMPic::
 EeveetoPic:        INCBIN "pic/trainer/cooltrainerm.pic"
 CooltrainerFPic::  INCBIN "pic/trainer/cooltrainerf.pic"
 BrunoPic::         INCBIN "pic/trainer/bruno.pic"
@@ -2424,7 +2425,7 @@ CalcEXPBarPixelLength:
 	inc de
 	ld a, [hl]
 	ld [de], a
-	
+
 	; get the exp needed to gain a level
 	ld a, [wBattleMonLevel]
 	ld d, a
@@ -2432,24 +2433,24 @@ CalcEXPBarPixelLength:
 	ld hl, CalcExperience
 	ld b, BANK(CalcExperience)
 	call Bankswitch
-	
+
 	; get the address of the active Pokemon's current experience
 	ld hl, wPartyMon1Exp
 	call BattleMonPartyAttr
-	
+
 	; current exp - base exp
 	ld b, h
 	ld c, l
 	ld hl, wEXPBarBaseEXP
 	ld de, wEXPBarCurEXP
 	call SubThreeByteNum
-	
+
 	; exp needed - base exp
 	ld bc, H_MULTIPLICAND
 	ld hl, wEXPBarBaseEXP
 	ld de, wEXPBarNeededEXP
 	call SubThreeByteNum
-	
+
 	; make the divisor an 8-bit number
 	ld hl, wEXPBarNeededEXP
 	ld de, wEXPBarCurEXP + 1
@@ -2507,13 +2508,13 @@ CalcEXPBarPixelLength:
 	ld a, $40
 	ld [H_MULTIPLIER], a
 	call Multiply
-	
+
 	; product / needed exp = pixel length
 	ld a, [wEXPBarNeededEXP + 2]
 	ld [H_DIVISOR], a
 	ld b, $04
 	jp Divide
-	
+
 ; calculates the three byte number starting at [bc]
 ; minus the three byte number starting at [hl]
 ; and stores it into the three bytes starting at [de]

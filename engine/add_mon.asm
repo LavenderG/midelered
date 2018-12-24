@@ -213,7 +213,10 @@ _AddPartyMon:
 	ld a, [hExperience + 2]
 	ld [de], a
 	xor a
-	ld b, NUM_STATS * 2
+	ld b, NUM_STATS
+	; stat exp in hl, default is 0
+	ld h, a
+	ld l, a
 ; NUEVO PARA ENTRENADORES MAX EVS
 ; write $FF to all stat experience values
 	; if the mon is the enemy in a trainer battle
@@ -223,10 +226,19 @@ _AddPartyMon:
 	ld a, [wIsInBattle]
 	dec a
 	jr z, .writeEVsLoop
-	ld a, $FF
+	; stat exp in hl, counter in b, mon in de
+	push bc
+	call GetBadgeStatExp
+	ld h, b
+	ld l, c
+	pop bc
 ; NUEVO PARA ENTRENADORES MAX EVS
-.writeEVsLoop              ; set all EVs to 0
+.writeEVsLoop              ; set all EVs
 	inc de
+	ld a, h
+	ld [de], a
+	inc de
+	ld a, l
 	ld [de], a
 	dec b
 	jr nz, .writeEVsLoop
@@ -281,7 +293,7 @@ _AddPartyMon:
 	ld a, [wBuffer + 1]
 	ld [hl], a
 	; NUEVO PARA ENTRENADORES MAX EVS
-	
+
 .done
 	scf
 	ret
