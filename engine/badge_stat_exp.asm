@@ -14,9 +14,9 @@ GetBadgeStatExp::
 	add hl, bc
 	add hl, bc
 	ld a, [hli]
-	ld b, a
-	ld a, [hl]
 	ld c, a
+	ld a, [hl]
+	ld b, a
 	pop hl
 	pop de
 	ret
