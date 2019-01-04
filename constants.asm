@@ -32,3 +32,4 @@ INCLUDE "constants/event_constants.asm"
 INCLUDE "constants/text_constants.asm"
 INCLUDE "constants/parties_constants.asm"
 INCLUDE "constants/level_constants.asm" ; NUEVO PARA NIVELES DINAMICOS DE ENTRENADO
+INCLUDE "constants/stats_constants.asm"

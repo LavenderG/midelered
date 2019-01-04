@@ -6342,9 +6342,9 @@ LoadEnemyMonData:
 	jr nz, .storeDVs
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?
-; fixed DVs for trainer mon
-    ld a, $FF
-	ld b, $FF
+; DVs for trainer mon
+    ld a, ATK_DEF_ENEMY_DV
+	ld b, SPD_SPC_ENEMY_DV
 	jr z, .storeDVs
 ; random DVs for wild mon
 	call BattleRandom
